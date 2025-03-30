@@ -92,6 +92,10 @@
         .highlighted {
             background-color: lightblue;
         }
+
+        .wrong-highlight {
+            background-color: lightcoral; /* Light red */
+        }
     </style>
 </head>
 <body>
@@ -202,6 +206,8 @@
         function handleUserInput(frequency) {
             if (!inputEnabled) return;
 
+            const clickedKey = Array.from(keyElements).find(key => parseFloat(key.dataset.freq) === frequency);
+
             if (targetFrequency === frequency) {
                 score++;
                 playAwardSound();
@@ -217,6 +223,12 @@
             } else {
                 playDudSound();
                 updateScore();
+                if(clickedKey){
+                    clickedKey.classList.add('wrong-highlight');
+                    setTimeout(() => {
+                        clickedKey.classList.remove('wrong-highlight');
+                    }, 500);
+                }
             }
         }
 
