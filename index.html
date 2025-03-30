@@ -202,10 +202,12 @@
         function handleUserInput(frequency) {
             if (!inputEnabled) return;
 
+            const feedbackElement = document.getElementById('feedback');
+
             if (targetFrequency === frequency) {
                 score++;
                 playAwardSound();
-                document.getElementById('feedback').textContent = "Correct!";
+                feedbackElement.textContent = "Correct!";
                 updateScore();
                 highlightCorrectKey();
                 if (timeLeft > 0) {
@@ -213,12 +215,16 @@
                     setTimeout(() => {
                         playTargetNote();
                         inputEnabled = true;
-                    }, 600);
+                        feedbackElement.textContent = "";
+                    }, 2000);
                 }
             } else {
                 playDudSound();
-                document.getElementById('feedback').textContent = "Incorrect!";
+                feedbackElement.textContent = "Incorrect!";
                 updateScore();
+                setTimeout(() => {
+                    feedbackElement.textContent = "";
+                }, 2000);
             }
         }
 
@@ -251,7 +257,7 @@
             document.getElementById('play-again-button').style.display = 'none';
             document.getElementById('feedback').textContent = "";
             inputEnabled = true;
-            keyElements.forEach(key => key.style.pointerEvents = 'auto'); //Re enable keyboard
+            keyElements.forEach(key => key.style.pointerEvents = 'auto');
             timer = setInterval(() => {
                 timeLeft--;
                 updateTimer();
@@ -260,7 +266,7 @@
                     document.getElementById('feedback').textContent = "Game Over!";
                     document.getElementById('play-again-button').style.display = 'block';
                     inputEnabled = false;
-                    keyElements.forEach(key => key.style.pointerEvents = 'none'); //Disable keyboard.
+                    keyElements.forEach(key => key.style.pointerEvents = 'none');
                 }
             }, 1000);
         }
