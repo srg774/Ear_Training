@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ear Training Game</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+            font-family: sans-serif;
+        }
+
+        .keyboard {
+            display: flex;
+            border: 2px solid black;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .octave {
+            display: flex;
+            position: relative;
+        }
+
+        .white {
+            width: 60px;
+            height: 240px;
+            background-color: white;
+            border: 1px solid black;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .black {
+            width: 36px;
+            height: 160px;
+            background-color: black;
+            display: inline-block;
+            position: absolute;
+            z-index: 2;
+            left: 30px;
+            transform: translateX(-18px);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .c-sharp {left: 60px;}
+        .d-sharp {left: 122px;}
+        .f-sharp {left: 246px;}
+        .g-sharp {left: 307px;}
+        .a-sharp {left: 368px;}
+
+        .octave-label {
+            position: absolute;
+            top: -22px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .c4-label {color: blue;}
+        .c5-label {color: red;}
+
+        #game-controls {
+            margin-top: 20px;
+        }
+
+        #game-info {
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .highlighted {
+            background-color: lightblue;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="keyboard">
+        <div class="octave">
+            <div class="octave-label c4-label">C4</div>
+            <div class="white" data-freq="261.63">C</div>
+            <div class="black c-sharp" data-freq="277.18">C#<br>D♭</div>
+            <div class="white" data-freq="293.66">D</div>
+            <div class="black d-sharp" data-freq="311.13">D#<br>E♭</div>
+            <div class="white" data-freq="329.63">E</div>
+            <div class="white" data-freq="349.23">F</div>
+            <div class="black f-sharp" data-freq="369.99">F#<br>G♭</div>
+            <div class="white" data-freq="392.00">G</div>
+            <div class="black g-sharp" data-freq="415.30">G#<br>A♭</div>
+            <div class="white" data-freq="440.00">A</div>
+            <div class="black a-sharp" data-freq="466.16">A#<br>B♭</div>
+            <div class="white" data-freq="493.88">B</div>
+        </div>
+        <div class="octave">
+            <div class="octave-label c5-label">C5</div>
+            <div class="white" data-freq="523.25">C</div>
+            <div class="black c-sharp" data-freq="554.37">C#<br>D♭</div>
+            <div class="white" data-freq="587.33">D</div>
+            <div class="black d-sharp" data-freq="622.25">D#<br>E♭</div>
+            <div class="white" data-freq="659.26">E</div>
+            <div class="white" data-freq="698.46">F</div>
+            <div class="black f-sharp" data-freq="739.99">F#<br>G♭</div>
+            <div class="white" data-freq="783.99">G</div>
+            <div class="black g-sharp" data-freq="830.61">G#<br>A♭</div>
+            <div class="white" data-freq="880.00">A</div>
+            <div class="black a-sharp" data-freq="932.33">A#<br>B♭</div>
+            <div class="white" data-freq="987.77">B</div>
+        </div>
+    </div>
+
+    <div id="game-controls">
+        <button id="start-game-button">Start Game</button>
+        <button id="recap-button">Recap Note</button>
+        <button id="play-again-button" style="display: none;">Play Again</button>
+        <button id="play-all-notes-button">Play All Notes</button>
+    </div>
+
+    <div id="game-info">
+        <p id="score">Score: 0</p>
+        <p id="high-score">High Score: 0</p>
+        <p id="time-remaining">Time: 60</p>
+        <p id="feedback"></p>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let score = 0;
+        let highScore = 0;
+        let timeLeft = 60;
+        let timer;
+        let targetFrequency;
+        let inputEnabled = true;
+
+        const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
+        const keyElements = document.querySelectorAll('.white, .black');
+
+        function generateRandomFrequency() {
+            return allFrequencies[Math.floor(Math.random() * allFrequencies.length)];
+        }
+
+        function playNote(frequency) {
+            const oscillator = audioCtx.createOscillator();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function playAwardSound() {
+            const oscillator = audioCtx.createOscillator();
+            oscillator.type = 'triangle';
+            oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
+            oscillator.frequency.setValueAtTime(700, audioCtx.currentTime + 0.2);
+            oscillator.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.4);
+        }
+
+        function playDudSound() {
+            const oscillator = audioCtx.createOscillator();
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.5);
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function playTargetNote() {
+            targetFrequency = generateRandomFrequency();
+            playNote(targetFrequency);
+        }
+
+        function handleUserInput(frequency) {
+            if (!inputEnabled) return;
+
+            if (targetFrequency === frequency) {
+                score++;
+                playAwardSound();
+                document.getElementById('feedback').textContent = "Correct!";
+                updateScore();
+                highlightCorrectKey();
+                if (timeLeft > 0) {
+                    inputEnabled = false;
+                    setTimeout(() => {
+                        playTargetNote();
+                        inputEnabled = true;
+                    }, 600);
+                }
+            } else {
+                playDudSound();
+                document.getElementById('feedback').textContent = "Incorrect!";
+                updateScore();
+            }
+        }
+
+        document.querySelectorAll('.white, .black').forEach(key => {
+            key.addEventListener('click', () => {
+                handleUserInput(parseFloat(key.dataset.freq));
+            });
+        });
+
+        function updateScore() {
+            document.getElementById('score').textContent = `Score: ${score}`;
+            if (score > highScore) {
+                highScore = score;
+                document.getElementById('high-score').textContent = `High Score: ${highScore}`;
+            }
+        }
+
+        function updateTimer() {
+            document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
+        }
+
+        function startGame() {
+            score = 0;
+            timeLeft = 60;
+            updateScore();
+            updateTimer();
+            playTargetNote();
+            document.getElementById('play-again-button').style.display = 'none';
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('feedback').textContent = "Time's up!";
+                    document.getElementById('play-again-button').style.display = 'block';
+                }
+            }, 1000);
+        }
+
+        document.getElementById('start-game-button').addEventListener('click', startGame);
+        document.getElementById('recap-button').addEventListener('click', () => {
+            if (targetFrequency) {
+                playNote(targetFrequency);
+            }
+        });
+        document.getElementById('play-again-button').addEventListener('click', startGame);
+
+        document.getElementById('play-all-notes-button').addEventListener('click', () => {
+            let delay = 0;
+            allFrequencies.forEach((freq, index) => {
+                setTimeout(() => {
+                    playNote(freq);
+                    highlightKey(freq);
+                }, delay);
+                delay += 600;
+            });
+        });
+
+        function highlightKey(frequency) {
+            keyElements.forEach(key => {
+                if (parseFloat(key.dataset.freq) === frequency) {
+                    key.classList.add('highlighted');
+                    setTimeout(() => {
+                        key.classList.remove('highlighted');
+                    }, 500);
+                }
+            });
+        }
+        function highlightCorrectKey(){
+            keyElements.forEach(key =>{
+                if (parseFloat(key.dataset.freq) === targetFrequency){
+                    key.classList.add('highlighted');
+                    setTimeout(()=>{
+                        key.classList.remove('highlighted');
+                    },500);
+                }
+            })
+        }
+    </script>
+</body>
+</html>
