@@ -202,12 +202,9 @@
         function handleUserInput(frequency) {
             if (!inputEnabled) return;
 
-            const feedbackElement = document.getElementById('feedback');
-
             if (targetFrequency === frequency) {
                 score++;
                 playAwardSound();
-                feedbackElement.textContent = "Correct!";
                 updateScore();
                 highlightCorrectKey();
                 if (timeLeft > 0) {
@@ -215,16 +212,11 @@
                     setTimeout(() => {
                         playTargetNote();
                         inputEnabled = true;
-                        feedbackElement.textContent = "";
-                    }, 2000);
+                    }, 600);
                 }
             } else {
                 playDudSound();
-                feedbackElement.textContent = "Incorrect!";
                 updateScore();
-                setTimeout(() => {
-                    feedbackElement.textContent = "";
-                }, 2000);
             }
         }
 
