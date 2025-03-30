@@ -49,4 +49,5 @@ Contributions are welcome! If you have any suggestions or improvements, please f
 
 ## License
 
-This project is open source. Feel free to use and modify it as you wish.
+This project is open source. Feel free to use and modify it as you wish. 
+My orignal concept: https://scratch.mit.edu/projects/750796738/fullscreen/
