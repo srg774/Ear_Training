@@ -1,5 +1,7 @@
 # Ear Training Game
 
+https://srg774.github.io/Ear_Training/
+
 This is a simple web-based ear training game that helps users practice identifying musical notes by their frequencies. The game features a virtual keyboard with playable notes and provides feedback on the user's accuracy.
 
 ## Features
