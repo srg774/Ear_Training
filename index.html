@@ -95,11 +95,10 @@
             gap: 10px;
         }
 
-        #game-info-container {
+        #score-time-container {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px; /* Space between score/time and buttons */
+            gap: 20px; /* Space between score/time elements */
+            margin-right: 20px; /* Space between score/time and start button */
         }
 
         #game-info {
@@ -108,7 +107,12 @@
         }
 
         #game-info p {
-            margin: 5px 0; /* Reduce vertical margin */
+            margin: 5px 10px 0 0; /* Adjust margins for spacing */
+            display: inline; /* Display elements in a line */
+        }
+
+        #game-info p:not(:last-child)::after {
+            content: " | "; /* Add a separator between score/time */
         }
 
         .highlighted {
@@ -188,12 +192,12 @@
     </div>
 
     <div id="game-controls">
-        <div id="game-info-container">
+        <div id="score-time-container">
             <div id="game-info">
                 <p id="score">Score: 0</p>
                 <p id="high-score">High Score: 0</p>
                 <p id="time-remaining">Time: 90</p>
-                <p id="feedback"></p>
+                <p id="feedback" style="display: none;"></p>
             </div>
             <button id="start-game-button">Start Game</button>
         </div>
@@ -212,6 +216,7 @@
         let inputEnabled = true;
         const orientationOverlay = document.getElementById('orientation-overlay');
         const keyboardContainer = document.querySelector('.keyboard-container');
+        const feedbackElement = document.getElementById('feedback');
 
         const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
         const keyElements = document.querySelectorAll('.white, .black');
@@ -226,18 +231,15 @@
                     orientationOverlay.style.display = 'flex';
                     keyboardContainer.style.display = 'none';
                     document.getElementById('game-controls').style.display = 'none';
-                    document.getElementById('game-info-container').style.display = 'none';
                 } else {
                     orientationOverlay.style.display = 'none';
                     keyboardContainer.style.display = 'flex';
                     document.getElementById('game-controls').style.display = 'flex';
-                    document.getElementById('game-info-container').style.display = 'flex';
                 }
             } else {
                 orientationOverlay.style.display = 'none';
                 keyboardContainer.style.display = 'flex';
                 document.getElementById('game-controls').style.display = 'flex';
-                document.getElementById('game-info-container').style.display = 'flex';
             }
         }
 
@@ -297,7 +299,7 @@
             if (targetFrequency === frequency) {
                 score++;
                 playAwardSound();
-                updateScore();
+                updateScoreDisplay();
                 highlightCorrectKey();
                 if (timeLeft > 0) {
                     inputEnabled = false;
@@ -308,7 +310,7 @@
                 }
             } else {
                 playDudSound();
-                updateScore();
+                updateScoreDisplay();
                 if(clickedKey){
                     clickedKey.classList.add('wrong-highlight');
                     setTimeout(() => {
@@ -324,7 +326,7 @@
             });
         });
 
-        function updateScore() {
+        function updateScoreDisplay() {
             document.getElementById('score').textContent = `Score: ${score}`;
             if (score > highScore) {
                 highScore = score;
@@ -332,7 +334,7 @@
             }
         }
 
-        function updateTimer() {
+        function updateTimerDisplay() {
             if(timeLeft >= 0){
             document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
             }
@@ -341,19 +343,20 @@
         function startGame() {
             score = 0;
             timeLeft = 90;
-            updateScore();
-            updateTimer();
+            updateScoreDisplay();
+            updateTimerDisplay();
+            feedbackElement.style.display = 'none';
             playTargetNote();
             document.getElementById('play-again-button').style.display = 'none';
-            document.getElementById('feedback').textContent = "";
             inputEnabled = true;
             keyElements.forEach(key => key.style.pointerEvents = 'auto');
             timer = setInterval(() => {
                 timeLeft--;
-                updateTimer();
+                updateTimerDisplay();
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    document.getElementById('feedback').textContent = "Game Over!";
+                    feedbackElement.textContent = "Game Over!";
+                    feedbackElement.style.display = 'block';
                     document.getElementById('play-again-button').style.display = 'block';
                     inputEnabled = false;
                     keyElements.forEach(key => key.style.pointerEvents = 'none');
@@ -394,12 +397,3 @@
             keyElements.forEach(key =>{
                 if (parseFloat(key.dataset.freq) === targetFrequency){
                     key.classList.add('highlighted');
-                    setTimeout(()=>{
-                        key.classList.remove('highlighted');
-                    },500);
-                }
-            })
-        }
-    </script>
-</body>
-</html>
