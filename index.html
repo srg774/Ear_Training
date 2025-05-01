@@ -89,13 +89,26 @@
         #game-controls {
             margin-top: 20px;
             display: flex;
+            flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+            justify-content: center; /* Center the items */
+            align-items: center; /* Vertically align items in case of wrapping */
             gap: 10px;
         }
 
+        #game-info-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px; /* Space between score/time and buttons */
+        }
+
         #game-info {
-            margin-top: 20px;
             font-size: 18px;
             text-align: center;
+        }
+
+        #game-info p {
+            margin: 5px 0; /* Reduce vertical margin */
         }
 
         .highlighted {
@@ -175,17 +188,18 @@
     </div>
 
     <div id="game-controls">
-        <button id="start-game-button">Start Game</button>
+        <div id="game-info-container">
+            <div id="game-info">
+                <p id="score">Score: 0</p>
+                <p id="high-score">High Score: 0</p>
+                <p id="time-remaining">Time: 90</p>
+                <p id="feedback"></p>
+            </div>
+            <button id="start-game-button">Start Game</button>
+        </div>
         <button id="recap-button">Recap Note</button>
         <button id="play-again-button" style="display: none;">Play Again</button>
         <button id="play-all-notes-button">Play All Notes</button>
-    </div>
-
-    <div id="game-info">
-        <p id="score">Score: 0</p>
-        <p id="high-score">High Score: 0</p>
-        <p id="time-remaining">Time: 90</p>
-        <p id="feedback"></p>
     </div>
 
     <script>
@@ -212,18 +226,18 @@
                     orientationOverlay.style.display = 'flex';
                     keyboardContainer.style.display = 'none';
                     document.getElementById('game-controls').style.display = 'none';
-                    document.getElementById('game-info').style.display = 'none';
+                    document.getElementById('game-info-container').style.display = 'none';
                 } else {
                     orientationOverlay.style.display = 'none';
                     keyboardContainer.style.display = 'flex';
                     document.getElementById('game-controls').style.display = 'flex';
-                    document.getElementById('game-info').style.display = 'block';
+                    document.getElementById('game-info-container').style.display = 'flex';
                 }
             } else {
                 orientationOverlay.style.display = 'none';
                 keyboardContainer.style.display = 'flex';
                 document.getElementById('game-controls').style.display = 'flex';
-                document.getElementById('game-info').style.display = 'block';
+                document.getElementById('game-info-container').style.display = 'flex';
             }
         }
 
