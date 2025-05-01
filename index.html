@@ -161,6 +161,12 @@ button {
     cursor: pointer;         /* Optional: shows pointer on hover */
     transition: background-color 0.3s ease;
 }
+        #score,
+#high-score,
+#time-remaining {
+    font-size: 22px; /* or any size you like */
+    font-weight: bold;
+}
 
     </style>
 </head>
@@ -371,7 +377,7 @@ button {
                 updateTimer();
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    document.getElementById('feedback').textContent = "Game Over!";
+                    document.getElementById('feedback').textContent = "";
                     document.getElementById('play-again-button').style.display = 'block';
                     inputEnabled = false;
                     keyElements.forEach(key => key.style.pointerEvents = 'none');
