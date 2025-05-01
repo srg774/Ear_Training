@@ -94,11 +94,37 @@
         }
 
         .wrong-highlight {
-            background-color: lightcoral; /* Light red */
+            background-color: lightcoral;
+        }
+
+        #rotate-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            z-index: 9999;
+            font-size: 1.5em;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            padding: 2em;
+        }
+
+        @media only screen and (max-width: 768px) and (orientation: portrait) {
+            #rotate-overlay {
+                display: flex;
+            }
         }
     </style>
 </head>
 <body>
+
+    <div id="rotate-overlay">
+        <p>Please rotate your device to landscape mode to play the game.</p>
+    </div>
 
     <div class="keyboard">
         <div class="octave">
@@ -223,7 +249,7 @@
             } else {
                 playDudSound();
                 updateScore();
-                if(clickedKey){
+                if (clickedKey) {
                     clickedKey.classList.add('wrong-highlight');
                     setTimeout(() => {
                         clickedKey.classList.remove('wrong-highlight');
@@ -232,7 +258,7 @@
             }
         }
 
-        document.querySelectorAll('.white, .black').forEach(key => {
+        keyElements.forEach(key => {
             key.addEventListener('click', () => {
                 handleUserInput(parseFloat(key.dataset.freq));
             });
@@ -247,8 +273,8 @@
         }
 
         function updateTimer() {
-            if(timeLeft >= 0){
-            document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
+            if (timeLeft >= 0) {
+                document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
             }
         }
 
@@ -282,10 +308,9 @@
             }
         });
         document.getElementById('play-again-button').addEventListener('click', startGame);
-
         document.getElementById('play-all-notes-button').addEventListener('click', () => {
             let delay = 0;
-            allFrequencies.forEach((freq, index) => {
+            allFrequencies.forEach((freq) => {
                 setTimeout(() => {
                     playNote(freq);
                     highlightKey(freq);
@@ -304,16 +329,30 @@
                 }
             });
         }
-        function highlightCorrectKey(){
-            keyElements.forEach(key =>{
-                if (parseFloat(key.dataset.freq) === targetFrequency){
+
+        function highlightCorrectKey() {
+            keyElements.forEach(key => {
+                if (parseFloat(key.dataset.freq) === targetFrequency) {
                     key.classList.add('highlighted');
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         key.classList.remove('highlighted');
-                    },500);
+                    }, 500);
                 }
-            })
+            });
         }
+
+        function checkOrientation() {
+            const overlay = document.getElementById('rotate-overlay');
+            if (window.innerHeight > window.innerWidth && window.innerWidth < 768) {
+                overlay.style.display = 'flex';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
+
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', checkOrientation);
+        window.addEventListener('load', checkOrientation);
     </script>
 </body>
 </html>
