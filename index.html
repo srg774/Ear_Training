@@ -24,10 +24,9 @@
         .keyboard {
             display: flex;
             border: 2px solid black;
-            padding: 15px;
+            padding: 20px;
             background-color: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            margin-bottom: 15px;
         }
 
         .octave {
@@ -36,8 +35,8 @@
         }
 
         .white {
-            width: 45px;
-            height: 180px;
+            width: 60px;
+            height: 240px;
             background-color: white;
             border: 1px solid black;
             display: inline-block;
@@ -46,41 +45,41 @@
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            padding-bottom: 8px;
-            font-size: 14px;
+            padding-bottom: 10px;
+            font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
 
         .black {
-            width: 27px;
-            height: 120px;
+            width: 36px;
+            height: 160px;
             background-color: black;
             display: inline-block;
             position: absolute;
             z-index: 2;
-            left: 22.5px;
-            transform: translateX(-50%);
+            left: 30px;
+            transform: translateX(-18px);
             cursor: pointer;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
-            font-size: 12px;
+            font-size: 14px;
             transition: background-color 0.3s ease;
         }
 
-        .c-sharp {left: calc(45px * 1 + 22.5px);}
-        .d-sharp {left: calc(45px * 2 + 22.5px);}
-        .f-sharp {left: calc(45px * 4 + 22.5px);}
-        .g-sharp {left: calc(45px * 5 + 22.5px);}
-        .a-sharp {left: calc(45px * 6 + 22.5px);}
+        .c-sharp {left: 60px;}
+        .d-sharp {left: 122px;}
+        .f-sharp {left: 246px;}
+        .g-sharp {left: 307px;}
+        .a-sharp {left: 368px;}
 
         .octave-label {
             position: absolute;
-            top: -18px;
-            font-size: 16px;
+            top: -22px;
+            font-size: 20px;
             font-weight: bold;
         }
 
@@ -88,47 +87,15 @@
         .c5-label {color: red;}
 
         #game-controls {
+            margin-top: 20px;
             display: flex;
-            justify-content: center;
-            align-items: center;
             gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap; /* Allows items to wrap on smaller screens */
-        }
-
-        #game-controls button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 10px;
-            background-color: #007bff;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        #game-controls button:hover {
-            background-color: #0056b3;
         }
 
         #game-info {
-            margin-top: 10px;
+            margin-top: 20px;
             font-size: 18px;
             text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        #game-info p {
-            margin: 5px 0;
-        }
-
-        #game-over-message {
-            font-weight: bold;
-            color: red;
         }
 
         .highlighted {
@@ -152,7 +119,7 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            font-size: 24px; /* Larger overlay text */
+            font-size: 20px;
             text-align: center;
         }
 
@@ -231,7 +198,6 @@
         let inputEnabled = true;
         const orientationOverlay = document.getElementById('orientation-overlay');
         const keyboardContainer = document.querySelector('.keyboard-container');
-        const feedbackElement = document.getElementById('feedback');
 
         const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
         const keyElements = document.querySelectorAll('.white, .black');
@@ -251,13 +217,13 @@
                     orientationOverlay.style.display = 'none';
                     keyboardContainer.style.display = 'flex';
                     document.getElementById('game-controls').style.display = 'flex';
-                    document.getElementById('game-info').style.display = 'flex';
+                    document.getElementById('game-info').style.display = 'block';
                 }
             } else {
                 orientationOverlay.style.display = 'none';
                 keyboardContainer.style.display = 'flex';
                 document.getElementById('game-controls').style.display = 'flex';
-                document.getElementById('game-info').style.display = 'flex';
+                document.getElementById('game-info').style.display = 'block';
             }
         }
 
@@ -319,24 +285,20 @@
                 playAwardSound();
                 updateScore();
                 highlightCorrectKey();
-                feedbackElement.textContent = "Correct!";
                 if (timeLeft > 0) {
                     inputEnabled = false;
                     setTimeout(() => {
                         playTargetNote();
                         inputEnabled = true;
-                        feedbackElement.textContent = "";
                     }, 600);
                 }
             } else {
                 playDudSound();
                 updateScore();
-                feedbackElement.textContent = "Try again!";
                 if(clickedKey){
                     clickedKey.classList.add('wrong-highlight');
                     setTimeout(() => {
                         clickedKey.classList.remove('wrong-highlight');
-                        feedbackElement.textContent = "";
                     }, 500);
                 }
             }
@@ -369,7 +331,7 @@
             updateTimer();
             playTargetNote();
             document.getElementById('play-again-button').style.display = 'none';
-            feedbackElement.textContent = "";
+            document.getElementById('feedback').textContent = "";
             inputEnabled = true;
             keyElements.forEach(key => key.style.pointerEvents = 'auto');
             timer = setInterval(() => {
@@ -377,7 +339,7 @@
                 updateTimer();
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    feedbackElement.textContent = "Game Over!";
+                    document.getElementById('feedback').textContent = "Game Over!";
                     document.getElementById('play-again-button').style.display = 'block';
                     inputEnabled = false;
                     keyElements.forEach(key => key.style.pointerEvents = 'none');
@@ -401,3 +363,29 @@
                     highlightKey(freq);
                 }, delay);
                 delay += 600;
+            });
+        });
+
+        function highlightKey(frequency) {
+            keyElements.forEach(key => {
+                if (parseFloat(key.dataset.freq) === frequency) {
+                    key.classList.add('highlighted');
+                    setTimeout(() => {
+                        key.classList.remove('highlighted');
+                    }, 500);
+                }
+            });
+        }
+        function highlightCorrectKey(){
+            keyElements.forEach(key =>{
+                if (parseFloat(key.dataset.freq) === targetFrequency){
+                    key.classList.add('highlighted');
+                    setTimeout(()=>{
+                        key.classList.remove('highlighted');
+                    },500);
+                }
+            })
+        }
+    </script>
+</body>
+</html>
