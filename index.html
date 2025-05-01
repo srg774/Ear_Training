@@ -90,40 +90,12 @@
             margin-top: 20px;
             display: flex;
             gap: 10px;
-            justify-content: center; /* Center buttons on mobile */
-            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
-        }
-
-        #game-controls button {
-            padding: 10px 15px;
-            border-radius: 20px; /* Rounded buttons */
-            border: 1px solid #ccc;
-            background-color: #f9f9f9;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        #game-controls button:hover {
-            background-color: #eee;
         }
 
         #game-info {
             margin-top: 20px;
             font-size: 18px;
             text-align: center;
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column; /* Default to column for desktop */
-        }
-
-        @media (max-width: 768px) { /* Target mobile devices */
-            #game-info {
-                flex-direction: row; /* Single line for mobile */
-                font-size: 16px; /* Adjust font size if needed */
-            }
         }
 
         .highlighted {
@@ -147,12 +119,12 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            font-size: 20px;
             text-align: center;
         }
 
         #orientation-overlay p {
             margin: 20px;
-            font-size: 24px; /* Larger text for readability */
         }
     </style>
 </head>
@@ -226,7 +198,6 @@
         let inputEnabled = true;
         const orientationOverlay = document.getElementById('orientation-overlay');
         const keyboardContainer = document.querySelector('.keyboard-container');
-        const gameInfo = document.getElementById('game-info');
 
         const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
         const keyElements = document.querySelectorAll('.white, .black');
@@ -241,19 +212,18 @@
                     orientationOverlay.style.display = 'flex';
                     keyboardContainer.style.display = 'none';
                     document.getElementById('game-controls').style.display = 'none';
-                    gameInfo.style.display = 'none';
+                    document.getElementById('game-info').style.display = 'none';
                 } else {
                     orientationOverlay.style.display = 'none';
                     keyboardContainer.style.display = 'flex';
                     document.getElementById('game-controls').style.display = 'flex';
-                    gameInfo.style.display = 'flex';
+                    document.getElementById('game-info').style.display = 'block';
                 }
             } else {
                 orientationOverlay.style.display = 'none';
                 keyboardContainer.style.display = 'flex';
                 document.getElementById('game-controls').style.display = 'flex';
-                gameInfo.style.display = 'flex';
-                gameInfo.style.flexDirection = 'column'; // Ensure column layout on desktop
+                document.getElementById('game-info').style.display = 'block';
             }
         }
 
@@ -398,4 +368,24 @@
 
         function highlightKey(frequency) {
             keyElements.forEach(key => {
-                if
+                if (parseFloat(key.dataset.freq) === frequency) {
+                    key.classList.add('highlighted');
+                    setTimeout(() => {
+                        key.classList.remove('highlighted');
+                    }, 500);
+                }
+            });
+        }
+        function highlightCorrectKey(){
+            keyElements.forEach(key =>{
+                if (parseFloat(key.dataset.freq) === targetFrequency){
+                    key.classList.add('highlighted');
+                    setTimeout(()=>{
+                        key.classList.remove('highlighted');
+                    },500);
+                }
+            })
+        }
+    </script>
+</body>
+</html>
