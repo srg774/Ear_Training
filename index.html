@@ -14,6 +14,25 @@
             font-family: sans-serif;
         }
 
+        .game-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 90%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        .game-info-inline {
+            font-size: 18px;
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
         .keyboard-container {
             display: flex;
             justify-content: center;
@@ -86,33 +105,12 @@
         .c4-label {color: blue;}
         .c5-label {color: red;}
 
-        #game-controls {
+        #feedback {
             margin-top: 20px;
-            display: flex;
-            flex-wrap: wrap; /* Allow items to wrap on smaller screens */
-            justify-content: center; /* Center the items */
-            align-items: center; /* Vertically align items in case of wrapping */
-            gap: 10px;
-        }
-
-        #score-time-container {
-            display: flex;
-            gap: 20px; /* Space between score/time elements */
-            margin-right: 20px; /* Space between score/time and start button */
-        }
-
-        #game-info {
-            font-size: 18px;
+            font-size: 20px;
+            font-weight: bold;
             text-align: center;
-        }
-
-        #game-info p {
-            margin: 5px 10px 0 0; /* Adjust margins for spacing */
-            display: inline; /* Display elements in a line */
-        }
-
-        #game-info p:not(:last-child)::after {
-            content: " | "; /* Add a separator between score/time */
+            color: red; /* Style for "Game Over!" message */
         }
 
         .highlighted {
@@ -156,6 +154,15 @@
         </svg>
     </div>
 
+    <div class="game-header">
+        <button id="start-game-button">Start Game</button>
+        <div class="game-info-inline">
+            <span id="score">Score: 0</span> |
+            <span id="high-score">High Score: 0</span> |
+            <span id="time-remaining">Time: 90</span>
+        </div>
+    </div>
+
     <div class="keyboard-container">
         <div class="keyboard">
             <div class="octave">
@@ -191,20 +198,13 @@
         </div>
     </div>
 
-    <div id="game-controls">
-        <div id="score-time-container">
-            <div id="game-info">
-                <p id="score">Score: 0</p>
-                <p id="high-score">High Score: 0</p>
-                <p id="time-remaining">Time: 90</p>
-                <p id="feedback" style="display: none;"></p>
-            </div>
-            <button id="start-game-button">Start Game</button>
-        </div>
+    <div class="game-controls">
         <button id="recap-button">Recap Note</button>
         <button id="play-again-button" style="display: none;">Play Again</button>
         <button id="play-all-notes-button">Play All Notes</button>
     </div>
+
+    <div id="feedback"></div>
 
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -216,7 +216,10 @@
         let inputEnabled = true;
         const orientationOverlay = document.getElementById('orientation-overlay');
         const keyboardContainer = document.querySelector('.keyboard-container');
-        const feedbackElement = document.getElementById('feedback');
+        const scoreDisplay = document.getElementById('score');
+        const highScoreDisplay = document.getElementById('high-score');
+        const timeRemainingDisplay = document.getElementById('time-remaining');
+        const feedbackDisplay = document.getElementById('feedback');
 
         const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
         const keyElements = document.querySelectorAll('.white, .black');
@@ -230,16 +233,22 @@
                 if (window.innerWidth < window.innerHeight) {
                     orientationOverlay.style.display = 'flex';
                     keyboardContainer.style.display = 'none';
-                    document.getElementById('game-controls').style.display = 'none';
+                    document.querySelector('.game-header').style.display = 'none';
+                    document.querySelector('.game-controls').style.display = 'none';
+                    feedbackDisplay.style.display = 'none';
                 } else {
                     orientationOverlay.style.display = 'none';
                     keyboardContainer.style.display = 'flex';
-                    document.getElementById('game-controls').style.display = 'flex';
+                    document.querySelector('.game-header').style.display = 'flex';
+                    document.querySelector('.game-controls').style.display = 'flex';
+                    feedbackDisplay.style.display = 'block';
                 }
             } else {
                 orientationOverlay.style.display = 'none';
                 keyboardContainer.style.display = 'flex';
-                document.getElementById('game-controls').style.display = 'flex';
+                document.querySelector('.game-header').style.display = 'flex';
+                document.querySelector('.game-controls').style.display = 'flex';
+                feedbackDisplay.style.display = 'block';
             }
         }
 
@@ -299,7 +308,7 @@
             if (targetFrequency === frequency) {
                 score++;
                 playAwardSound();
-                updateScoreDisplay();
+                updateScore();
                 highlightCorrectKey();
                 if (timeLeft > 0) {
                     inputEnabled = false;
@@ -310,7 +319,7 @@
                 }
             } else {
                 playDudSound();
-                updateScoreDisplay();
+                updateScore();
                 if(clickedKey){
                     clickedKey.classList.add('wrong-highlight');
                     setTimeout(() => {
@@ -326,37 +335,36 @@
             });
         });
 
-        function updateScoreDisplay() {
-            document.getElementById('score').textContent = `Score: ${score}`;
+        function updateScore() {
+            scoreDisplay.textContent = `Score: ${score}`;
             if (score > highScore) {
                 highScore = score;
-                document.getElementById('high-score').textContent = `High Score: ${highScore}`;
+                highScoreDisplay.textContent = `High Score: ${highScore}`;
             }
         }
 
-        function updateTimerDisplay() {
+        function updateTimer() {
             if(timeLeft >= 0){
-            document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
+            timeRemainingDisplay.textContent = `Time: ${timeLeft}`;
             }
         }
 
         function startGame() {
             score = 0;
             timeLeft = 90;
-            updateScoreDisplay();
-            updateTimerDisplay();
-            feedbackElement.style.display = 'none';
+            updateScore();
+            updateTimer();
             playTargetNote();
             document.getElementById('play-again-button').style.display = 'none';
+            feedbackDisplay.textContent = "";
             inputEnabled = true;
             keyElements.forEach(key => key.style.pointerEvents = 'auto');
             timer = setInterval(() => {
                 timeLeft--;
-                updateTimerDisplay();
+                updateTimer();
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    feedbackElement.textContent = "Game Over!";
-                    feedbackElement.style.display = 'block';
+                    feedbackDisplay.textContent = "Game Over!";
                     document.getElementById('play-again-button').style.display = 'block';
                     inputEnabled = false;
                     keyElements.forEach(key => key.style.pointerEvents = 'none');
@@ -397,3 +405,8 @@
             keyElements.forEach(key =>{
                 if (parseFloat(key.dataset.freq) === targetFrequency){
                     key.classList.add('highlighted');
+                    setTimeout(()=>{
+                        key.classList.remove('highlighted');
+                    },500);
+                }
+            })
