@@ -19,14 +19,16 @@
             justify-content: center;
             align-items: center;
             width: 100%;
+            margin-bottom: 20px; /* Add some space below the keyboard */
         }
 
         .keyboard {
             display: flex;
             border: 2px solid black;
-            padding: 20px;
+            padding: 15px; /* Slightly reduce padding */
             background-color: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px; /* Add rounded corners */
         }
 
         .octave {
@@ -35,8 +37,8 @@
         }
 
         .white {
-            width: 60px;
-            height: 240px;
+            width: 50px; /* Slightly smaller white keys */
+            height: 200px; /* Slightly shorter white keys */
             background-color: white;
             border: 1px solid black;
             display: inline-block;
@@ -45,41 +47,45 @@
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            padding-bottom: 10px;
-            font-size: 16px;
+            padding-bottom: 8px; /* Adjust padding */
+            font-size: 14px; /* Slightly smaller font */
             cursor: pointer;
             transition: background-color 0.3s ease;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
         }
 
         .black {
-            width: 36px;
-            height: 160px;
+            width: 30px; /* Slightly smaller black keys */
+            height: 130px; /* Slightly shorter black keys */
             background-color: black;
             display: inline-block;
             position: absolute;
             z-index: 2;
-            left: 30px;
-            transform: translateX(-18px);
+            left: 25px; /* Adjust positioning */
+            transform: translateX(-15px); /* Adjust transform */
             cursor: pointer;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
-            font-size: 14px;
+            font-size: 12px; /* Slightly smaller font */
             transition: background-color 0.3s ease;
+            border-bottom-left-radius: 3px;
+            border-bottom-right-radius: 3px;
         }
 
-        .c-sharp {left: 60px;}
-        .d-sharp {left: 122px;}
-        .f-sharp {left: 246px;}
-        .g-sharp {left: 307px;}
-        .a-sharp {left: 368px;}
+        .c-sharp {left: 50px;}
+        .d-sharp {left: 102px;}
+        .f-sharp {left: 206px;}
+        .g-sharp {left: 257px;}
+        .a-sharp {left: 308px;}
 
         .octave-label {
             position: absolute;
-            top: -22px;
-            font-size: 20px;
+            top: -18px; /* Adjust label position */
+            font-size: 16px; /* Slightly smaller label */
             font-weight: bold;
         }
 
@@ -87,23 +93,20 @@
         .c5-label {color: red;}
 
         #game-controls {
-            margin-top: 20px;
+            margin-top: 10px;
             display: flex;
-            gap: 10px;
+            gap: 5px; /* Reduce gap between buttons */
         }
 
         #game-info {
-            margin-top: 20px;
-            font-size: 18px;
+            margin-top: 10px;
+            font-size: 16px; /* Slightly smaller font */
             text-align: center;
-        }
-
-        .highlighted {
-            background-color: lightblue;
-        }
-
-        .wrong-highlight {
-            background-color: lightcoral; /* Light red */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px; /* Space between info elements */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
         }
 
         #orientation-overlay {
@@ -119,12 +122,20 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            font-size: 20px;
+            font-size: 24px; /* Larger font for overlay text */
             text-align: center;
         }
 
         #orientation-overlay p {
             margin: 20px;
+        }
+
+        .highlighted {
+            background-color: lightblue;
+        }
+
+        .wrong-highlight {
+            background-color: lightcoral; /* Light red */
         }
     </style>
 </head>
@@ -182,10 +193,10 @@
     </div>
 
     <div id="game-info">
-        <p id="score">Score: 0</p>
-        <p id="high-score">High Score: 0</p>
-        <p id="time-remaining">Time: 90</p>
-        <p id="feedback"></p>
+        <span id="score">Score: 0</span>
+        <span id="high-score">High Score: 0</span>
+        <span id="time-remaining">Time: 90</span>
+        <span id="feedback"></span>
     </div>
 
     <script>
@@ -217,13 +228,13 @@
                     orientationOverlay.style.display = 'none';
                     keyboardContainer.style.display = 'flex';
                     document.getElementById('game-controls').style.display = 'flex';
-                    document.getElementById('game-info').style.display = 'block';
+                    document.getElementById('game-info').style.display = 'flex'; /* Ensure game info is flex */
                 }
             } else {
                 orientationOverlay.style.display = 'none';
                 keyboardContainer.style.display = 'flex';
                 document.getElementById('game-controls').style.display = 'flex';
-                document.getElementById('game-info').style.display = 'block';
+                document.getElementById('game-info').style.display = 'flex'; /* Ensure game info is flex */
             }
         }
 
@@ -379,13 +390,4 @@
         function highlightCorrectKey(){
             keyElements.forEach(key =>{
                 if (parseFloat(key.dataset.freq) === targetFrequency){
-                    key.classList.add('highlighted');
-                    setTimeout(()=>{
-                        key.classList.remove('highlighted');
-                    },500);
-                }
-            })
-        }
-    </script>
-</body>
-</html>
+                    key.classList
