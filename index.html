@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Ear Training Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             display: flex;
@@ -32,35 +33,29 @@
             height: 240px;
             background-color: white;
             border: 1px solid black;
-            display: inline-block;
-            position: relative;
-            z-index: 1;
             display: flex;
             justify-content: center;
             align-items: flex-end;
             padding-bottom: 10px;
             font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            z-index: 1;
         }
 
         .black {
             width: 36px;
             height: 160px;
             background-color: black;
-            display: inline-block;
             position: absolute;
             z-index: 2;
             left: 30px;
             transform: translateX(-18px);
             cursor: pointer;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
             font-size: 14px;
-            transition: background-color 0.3s ease;
         }
 
         .c-sharp {left: 60px;}
@@ -97,66 +92,41 @@
             background-color: lightcoral;
         }
 
+        /* MOBILE OVERLAY */
         #rotate-overlay {
-            display: none;
             position: fixed;
             top: 0; left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
             color: white;
-            z-index: 9999;
-            font-size: 1.5em;
-            text-align: center;
+            display: none;
             justify-content: center;
             align-items: center;
-            padding: 2em;
+            text-align: center;
+            font-size: 24px;
+            padding: 20px;
+            z-index: 9999;
         }
 
-        @media only screen and (max-width: 768px) and (orientation: portrait) {
-            #rotate-overlay {
-                display: flex;
-            }
+        #rotate-overlay img {
+            margin-top: 20px;
+            width: 80px;
+            height: auto;
         }
     </style>
 </head>
 <body>
 
+    <!-- MOBILE OVERLAY -->
     <div id="rotate-overlay">
-        <p>Please rotate your device to landscape mode to play the game.</p>
+        Please rotate your device to landscape to play the game.<br>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Antu_orientation-horizontal.svg/1200px-Antu_orientation-horizontal.svg.png" alt="Rotate icon">
     </div>
 
     <div class="keyboard">
-        <div class="octave">
-            <div class="octave-label c4-label">C4</div>
-            <div class="white" data-freq="261.63">C</div>
-            <div class="black c-sharp" data-freq="277.18">C#<br>D♭</div>
-            <div class="white" data-freq="293.66">D</div>
-            <div class="black d-sharp" data-freq="311.13">D#<br>E♭</div>
-            <div class="white" data-freq="329.63">E</div>
-            <div class="white" data-freq="349.23">F</div>
-            <div class="black f-sharp" data-freq="369.99">F#<br>G♭</div>
-            <div class="white" data-freq="392.00">G</div>
-            <div class="black g-sharp" data-freq="415.30">G#<br>A♭</div>
-            <div class="white" data-freq="440.00">A</div>
-            <div class="black a-sharp" data-freq="466.16">A#<br>B♭</div>
-            <div class="white" data-freq="493.88">B</div>
-        </div>
-        <div class="octave">
-            <div class="octave-label c5-label">C5</div>
-            <div class="white" data-freq="523.25">C</div>
-            <div class="black c-sharp" data-freq="554.37">C#<br>D♭</div>
-            <div class="white" data-freq="587.33">D</div>
-            <div class="black d-sharp" data-freq="622.25">D#<br>E♭</div>
-            <div class="white" data-freq="659.26">E</div>
-            <div class="white" data-freq="698.46">F</div>
-            <div class="black f-sharp" data-freq="739.99">F#<br>G♭</div>
-            <div class="white" data-freq="783.99">G</div>
-            <div class="black g-sharp" data-freq="830.61">G#<br>A♭</div>
-            <div class="white" data-freq="880.00">A</div>
-            <div class="black a-sharp" data-freq="932.33">A#<br>B♭</div>
-            <div class="white" data-freq="987.77">B</div>
-        </div>
+        <!-- Your keyboard keys go here (unchanged) -->
+        <!-- OMITTED HERE for brevity but paste your <div class="octave"> blocks here -->
     </div>
 
     <div id="game-controls">
@@ -174,176 +144,12 @@
     </div>
 
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let score = 0;
-        let highScore = 0;
-        let timeLeft = 90;
-        let timer;
-        let targetFrequency;
-        let inputEnabled = true;
+        // Game Logic (paste yours here, unchanged)
 
-        const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
-        const keyElements = document.querySelectorAll('.white, .black');
-
-        function generateRandomFrequency() {
-            return allFrequencies[Math.floor(Math.random() * allFrequencies.length)];
-        }
-
-        function playNote(frequency) {
-            const oscillator = audioCtx.createOscillator();
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-            const gainNode = audioCtx.createGain();
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.5);
-        }
-
-        function playAwardSound() {
-            const oscillator = audioCtx.createOscillator();
-            oscillator.type = 'triangle';
-            oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
-            oscillator.frequency.setValueAtTime(700, audioCtx.currentTime + 0.2);
-            oscillator.connect(audioCtx.destination);
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.4);
-        }
-
-        function playDudSound() {
-            const oscillator = audioCtx.createOscillator();
-            oscillator.type = 'sawtooth';
-            oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
-            oscillator.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.5);
-            const gainNode = audioCtx.createGain();
-            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.5);
-        }
-
-        function playTargetNote() {
-            targetFrequency = generateRandomFrequency();
-            playNote(targetFrequency);
-        }
-
-        function handleUserInput(frequency) {
-            if (!inputEnabled) return;
-
-            const clickedKey = Array.from(keyElements).find(key => parseFloat(key.dataset.freq) === frequency);
-
-            if (targetFrequency === frequency) {
-                score++;
-                playAwardSound();
-                updateScore();
-                highlightCorrectKey();
-                if (timeLeft > 0) {
-                    inputEnabled = false;
-                    setTimeout(() => {
-                        playTargetNote();
-                        inputEnabled = true;
-                    }, 600);
-                }
-            } else {
-                playDudSound();
-                updateScore();
-                if (clickedKey) {
-                    clickedKey.classList.add('wrong-highlight');
-                    setTimeout(() => {
-                        clickedKey.classList.remove('wrong-highlight');
-                    }, 500);
-                }
-            }
-        }
-
-        keyElements.forEach(key => {
-            key.addEventListener('click', () => {
-                handleUserInput(parseFloat(key.dataset.freq));
-            });
-        });
-
-        function updateScore() {
-            document.getElementById('score').textContent = `Score: ${score}`;
-            if (score > highScore) {
-                highScore = score;
-                document.getElementById('high-score').textContent = `High Score: ${highScore}`;
-            }
-        }
-
-        function updateTimer() {
-            if (timeLeft >= 0) {
-                document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
-            }
-        }
-
-        function startGame() {
-            score = 0;
-            timeLeft = 90;
-            updateScore();
-            updateTimer();
-            playTargetNote();
-            document.getElementById('play-again-button').style.display = 'none';
-            document.getElementById('feedback').textContent = "";
-            inputEnabled = true;
-            keyElements.forEach(key => key.style.pointerEvents = 'auto');
-            timer = setInterval(() => {
-                timeLeft--;
-                updateTimer();
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    document.getElementById('feedback').textContent = "Game Over!";
-                    document.getElementById('play-again-button').style.display = 'block';
-                    inputEnabled = false;
-                    keyElements.forEach(key => key.style.pointerEvents = 'none');
-                }
-            }, 1000);
-        }
-
-        document.getElementById('start-game-button').addEventListener('click', startGame);
-        document.getElementById('recap-button').addEventListener('click', () => {
-            if (targetFrequency) {
-                playNote(targetFrequency);
-            }
-        });
-        document.getElementById('play-again-button').addEventListener('click', startGame);
-        document.getElementById('play-all-notes-button').addEventListener('click', () => {
-            let delay = 0;
-            allFrequencies.forEach((freq) => {
-                setTimeout(() => {
-                    playNote(freq);
-                    highlightKey(freq);
-                }, delay);
-                delay += 600;
-            });
-        });
-
-        function highlightKey(frequency) {
-            keyElements.forEach(key => {
-                if (parseFloat(key.dataset.freq) === frequency) {
-                    key.classList.add('highlighted');
-                    setTimeout(() => {
-                        key.classList.remove('highlighted');
-                    }, 500);
-                }
-            });
-        }
-
-        function highlightCorrectKey() {
-            keyElements.forEach(key => {
-                if (parseFloat(key.dataset.freq) === targetFrequency) {
-                    key.classList.add('highlighted');
-                    setTimeout(() => {
-                        key.classList.remove('highlighted');
-                    }, 500);
-                }
-            });
-        }
-
+        // Orientation detection
         function checkOrientation() {
             const overlay = document.getElementById('rotate-overlay');
-            if (window.innerHeight > window.innerWidth && window.innerWidth < 768) {
+            if (window.matchMedia("(orientation: portrait)").matches) {
                 overlay.style.display = 'flex';
             } else {
                 overlay.style.display = 'none';
