@@ -19,16 +19,15 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            margin-bottom: 20px; /* Add some space below the keyboard */
         }
 
         .keyboard {
             display: flex;
             border: 2px solid black;
-            padding: 15px; /* Slightly reduce padding */
+            padding: 15px;
             background-color: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 8px; /* Add rounded corners */
+            margin-bottom: 15px;
         }
 
         .octave {
@@ -37,8 +36,8 @@
         }
 
         .white {
-            width: 50px; /* Slightly smaller white keys */
-            height: 200px; /* Slightly shorter white keys */
+            width: 45px;
+            height: 180px;
             background-color: white;
             border: 1px solid black;
             display: inline-block;
@@ -47,45 +46,41 @@
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            padding-bottom: 8px; /* Adjust padding */
-            font-size: 14px; /* Slightly smaller font */
+            padding-bottom: 8px;
+            font-size: 14px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            border-bottom-left-radius: 5px;
-            border-bottom-right-radius: 5px;
         }
 
         .black {
-            width: 30px; /* Slightly smaller black keys */
-            height: 130px; /* Slightly shorter black keys */
+            width: 27px;
+            height: 120px;
             background-color: black;
             display: inline-block;
             position: absolute;
             z-index: 2;
-            left: 25px; /* Adjust positioning */
-            transform: translateX(-15px); /* Adjust transform */
+            left: 22.5px;
+            transform: translateX(-50%);
             cursor: pointer;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
-            font-size: 12px; /* Slightly smaller font */
+            font-size: 12px;
             transition: background-color 0.3s ease;
-            border-bottom-left-radius: 3px;
-            border-bottom-right-radius: 3px;
         }
 
-        .c-sharp {left: 50px;}
-        .d-sharp {left: 102px;}
-        .f-sharp {left: 206px;}
-        .g-sharp {left: 257px;}
-        .a-sharp {left: 308px;}
+        .c-sharp {left: calc(45px * 1 + 22.5px);}
+        .d-sharp {left: calc(45px * 2 + 22.5px);}
+        .f-sharp {left: calc(45px * 4 + 22.5px);}
+        .g-sharp {left: calc(45px * 5 + 22.5px);}
+        .a-sharp {left: calc(45px * 6 + 22.5px);}
 
         .octave-label {
             position: absolute;
-            top: -18px; /* Adjust label position */
-            font-size: 16px; /* Slightly smaller label */
+            top: -18px;
+            font-size: 16px;
             font-weight: bold;
         }
 
@@ -93,20 +88,55 @@
         .c5-label {color: red;}
 
         #game-controls {
-            margin-top: 10px;
             display: flex;
-            gap: 5px; /* Reduce gap between buttons */
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+        }
+
+        #game-controls button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 10px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #game-controls button:hover {
+            background-color: #0056b3;
         }
 
         #game-info {
             margin-top: 10px;
-            font-size: 16px; /* Slightly smaller font */
+            font-size: 18px;
             text-align: center;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 15px; /* Space between info elements */
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        #game-info p {
+            margin: 5px 0;
+        }
+
+        #game-over-message {
+            font-weight: bold;
+            color: red;
+        }
+
+        .highlighted {
+            background-color: lightblue;
+        }
+
+        .wrong-highlight {
+            background-color: lightcoral; /* Light red */
         }
 
         #orientation-overlay {
@@ -122,20 +152,12 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            font-size: 24px; /* Larger font for overlay text */
+            font-size: 24px; /* Larger overlay text */
             text-align: center;
         }
 
         #orientation-overlay p {
             margin: 20px;
-        }
-
-        .highlighted {
-            background-color: lightblue;
-        }
-
-        .wrong-highlight {
-            background-color: lightcoral; /* Light red */
         }
     </style>
 </head>
@@ -193,10 +215,10 @@
     </div>
 
     <div id="game-info">
-        <span id="score">Score: 0</span>
-        <span id="high-score">High Score: 0</span>
-        <span id="time-remaining">Time: 90</span>
-        <span id="feedback"></span>
+        <p id="score">Score: 0</p>
+        <p id="high-score">High Score: 0</p>
+        <p id="time-remaining">Time: 90</p>
+        <p id="feedback"></p>
     </div>
 
     <script>
@@ -209,6 +231,7 @@
         let inputEnabled = true;
         const orientationOverlay = document.getElementById('orientation-overlay');
         const keyboardContainer = document.querySelector('.keyboard-container');
+        const feedbackElement = document.getElementById('feedback');
 
         const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
         const keyElements = document.querySelectorAll('.white, .black');
@@ -228,13 +251,13 @@
                     orientationOverlay.style.display = 'none';
                     keyboardContainer.style.display = 'flex';
                     document.getElementById('game-controls').style.display = 'flex';
-                    document.getElementById('game-info').style.display = 'flex'; /* Ensure game info is flex */
+                    document.getElementById('game-info').style.display = 'flex';
                 }
             } else {
                 orientationOverlay.style.display = 'none';
                 keyboardContainer.style.display = 'flex';
                 document.getElementById('game-controls').style.display = 'flex';
-                document.getElementById('game-info').style.display = 'flex'; /* Ensure game info is flex */
+                document.getElementById('game-info').style.display = 'flex';
             }
         }
 
@@ -296,20 +319,24 @@
                 playAwardSound();
                 updateScore();
                 highlightCorrectKey();
+                feedbackElement.textContent = "Correct!";
                 if (timeLeft > 0) {
                     inputEnabled = false;
                     setTimeout(() => {
                         playTargetNote();
                         inputEnabled = true;
+                        feedbackElement.textContent = "";
                     }, 600);
                 }
             } else {
                 playDudSound();
                 updateScore();
+                feedbackElement.textContent = "Try again!";
                 if(clickedKey){
                     clickedKey.classList.add('wrong-highlight');
                     setTimeout(() => {
                         clickedKey.classList.remove('wrong-highlight');
+                        feedbackElement.textContent = "";
                     }, 500);
                 }
             }
@@ -342,7 +369,7 @@
             updateTimer();
             playTargetNote();
             document.getElementById('play-again-button').style.display = 'none';
-            document.getElementById('feedback').textContent = "";
+            feedbackElement.textContent = "";
             inputEnabled = true;
             keyElements.forEach(key => key.style.pointerEvents = 'auto');
             timer = setInterval(() => {
@@ -350,7 +377,7 @@
                 updateTimer();
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    document.getElementById('feedback').textContent = "Game Over!";
+                    feedbackElement.textContent = "Game Over!";
                     document.getElementById('play-again-button').style.display = 'block';
                     inputEnabled = false;
                     keyElements.forEach(key => key.style.pointerEvents = 'none');
@@ -374,20 +401,3 @@
                     highlightKey(freq);
                 }, delay);
                 delay += 600;
-            });
-        });
-
-        function highlightKey(frequency) {
-            keyElements.forEach(key => {
-                if (parseFloat(key.dataset.freq) === frequency) {
-                    key.classList.add('highlighted');
-                    setTimeout(() => {
-                        key.classList.remove('highlighted');
-                    }, 500);
-                }
-            });
-        }
-        function highlightCorrectKey(){
-            keyElements.forEach(key =>{
-                if (parseFloat(key.dataset.freq) === targetFrequency){
-                    key.classList
