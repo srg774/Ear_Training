@@ -240,84 +240,70 @@ button {
         let timeLeft = 90;
         let timer;
         let targetFrequency;
-        let targetNote; // Add this to store the target note name (e.g., "C4")
         let inputEnabled = true;
         const orientationOverlay = document.getElementById('orientation-overlay');
         const keyboardContainer = document.querySelector('.keyboard-container');
-        // We don't need allFrequencies anymore as we'll use the note names
+        const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
         const keyElements = document.querySelectorAll('.white, .black');
 
-        // --- New Audio Context and Buffers ---
+        // --- New Audio Variables and Functions ---
         const noteBuffers = {};
         const noteFiles = {
-          "C4": "Assets/C4.wav", "C4-sharp": "Assets/C4-sharp.wav", "D4": "Assets/D4.wav",
-          "D4-sharp": "Assets/D4-sharp.wav", "E4": "Assets/E4.wav", "F4": "Assets/F4.wav",
-          "F4-sharp": "Assets/F4-sharp.wav", "G4": "Assets/G4.wav", "G4-sharp": "Assets/G4-sharp.wav",
-          "A4": "Assets/A4.wav", "A4-sharp": "Assets/A4-sharp.wav", "B4": "Assets/B4.wav",
-          "C5": "Assets/C5.wav", "C5-sharp": "Assets/C5-sharp.wav", "D5": "Assets/D5.wav",
-          "D5-sharp": "Assets/D5-sharp.wav", "E5": "Assets/E5.wav", "F5": "Assets/F5.wav",
-          "F5-sharp": "Assets/F5-sharp.wav", "G5": "Assets/G5.wav", "G5-sharp": "Assets/G5-sharp.wav",
-          "A5": "Assets/A5.wav", "A5-sharp": "Assets/A5-sharp.wav", "B5": "Assets/B5.wav"
+          "261.63": "Assets/C4.wav", "277.18": "Assets/C4-sharp.wav", "293.66": "Assets/D4.wav",
+          "311.13": "Assets/D4-sharp.wav", "329.63": "Assets/E4.wav", "349.23": "Assets/F4.wav",
+          "369.99": "Assets/F4-sharp.wav", "392.00": "Assets/G4.wav", "415.30": "Assets/G4-sharp.wav",
+          "440.00": "Assets/A4.wav", "466.16": "Assets/A4-sharp.wav", "493.88": "Assets/B4.wav",
+          "523.25": "Assets/C5.wav", "554.37": "Assets/C5-sharp.wav", "587.33": "Assets/D5.wav",
+          "622.25": "Assets/D5-sharp.wav", "659.26": "Assets/E5.wav", "698.46": "Assets/F5.wav",
+          "739.99": "Assets/F5-sharp.wav", "783.99": "Assets/G5.wav", "830.61": "Assets/G5-sharp.wav",
+          "880.00": "Assets/A5.wav", "932.33": "Assets/A5-sharp.wav", "987.77": "Assets/B5.wav"
         };
-        const chromaticNotes = [
-          "C4", "C4-sharp", "D4", "D4-sharp", "E4",
-          "F4", "F4-sharp", "G4", "G4-sharp", "A4", "A4-sharp", "B4",
-          "C5", "C5-sharp", "D5", "D5-sharp", "E5",
-          "F5", "F5-sharp", "G5", "G5-sharp", "A5", "A5-sharp", "B5"
-        ];
 
         async function loadBuffers() {
-          for (const note in noteFiles) {
-            const response = await fetch(noteFiles[note]);
+          for (const freq in noteFiles) {
+            const response = await fetch(noteFiles[freq]);
             const arrayBuffer = await response.arrayBuffer();
-            noteBuffers[note] = await audioContext.decodeAudioData(arrayBuffer);
+            noteBuffers[freq] = await audioCtx.decodeAudioData(arrayBuffer);
           }
         }
 
-        function playNoteAtTime(note, time) {
-          const buffer = noteBuffers[note];
+        function playBuffer(buffer) {
           if (buffer) {
-            const source = audioContext.createBufferSource();
+            const source = audioCtx.createBufferSource();
             source.buffer = buffer;
-            source.connect(audioContext.destination);
-            source.start(time);
+            source.connect(audioCtx.destination);
+            source.start();
           }
         }
 
-        function playRewardSound() {
-          const now = audioContext.currentTime;
-          const freqs = [523.25, 659.25, 783.99]; // C5, E5, G5
-
-          freqs.forEach((freq, i) => {
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-
-            osc.type = "sine";
-            osc.frequency.setValueAtTime(freq, now);
-            gain.gain.setValueAtTime(0.67, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-
-            osc.connect(gain).connect(audioContext.destination);
-            osc.start(now + i * 0.03);
-            osc.stop(now + 1);
-          });
+        function playCorrectSound() {
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, now);
+            gain.gain.setValueAtTime(0.7, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.4);
         }
 
         function playMistakeSound() {
-          const now = audioContext.currentTime;
-          const osc = audioContext.createOscillator();
-          const gain = audioContext.createGain();
-
-          osc.type = "triangle";
-          osc.frequency.setValueAtTime(261.63, now); // C4
-          gain.gain.setValueAtTime(0.67, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-
-          osc.connect(gain).connect(audioContext.destination);
-          osc.start(now);
-          osc.stop(now + 0.7);
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(220, now);
+            gain.gain.setValueAtTime(0.5, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.5);
         }
-        // --- End of New Audio Context and Buffers ---
+        // --- End of New Audio Variables and Functions ---
 
         function isMobileOrTablet() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -348,9 +334,144 @@ button {
             loadBuffers(); // Load the audio buffers when the page loads
         });
 
-        function frequencyToNoteName(frequency) {
-            const freqMap = {
-                261.63: "C4", 277.18: "C4-sharp", 293.66: "D4", 311.13: "D4-sharp", 329.63: "E4",
-                349.23: "F4", 369.99: "F4-sharp", 392.00: "G4", 415.30: "G4-sharp", 440.00: "A4", 466.16: "A4-sharp", 493.88: "B4",
-                523.25: "C5", 554.37: "C5-sharp", 587.33: "D5", 622.25: "D5-sharp", 659.26: "E5",
-                698.46: "F5", 739.99:
+        function generateRandomFrequency() {
+            return allFrequencies[Math.floor(Math.random() * allFrequencies.length)];
+        }
+
+        function playNote(frequency) {
+            const freqString = frequency.toFixed(2);
+            if (noteBuffers[freqString]) {
+                playBuffer(noteBuffers[freqString]);
+            } else {
+                // Fallback to the oscillator if the buffer isn't loaded (shouldn't happen)
+                const oscillator = audioCtx.createOscillator();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+                const gainNode = audioCtx.createGain();
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.5);
+            }
+        }
+
+        function playTargetNote() {
+            targetFrequency = generateRandomFrequency();
+            playNote(targetFrequency);
+        }
+
+        function handleUserInput(frequency) {
+            if (!inputEnabled) return;
+
+            const clickedKey = Array.from(keyElements).find(key => parseFloat(key.dataset.freq) === frequency);
+
+            if (targetFrequency === frequency) {
+                score++;
+                playCorrectSound(); // Use the new correct sound
+                updateScore();
+                highlightCorrectKey();
+                if (timeLeft > 0) {
+                    inputEnabled = false;
+                    setTimeout(() => {
+                        playTargetNote();
+                        inputEnabled = true;
+                    }, 600);
+                }
+            } else {
+                playMistakeSound(); // Use the new mistake sound
+                updateScore();
+                if (clickedKey) {
+                    clickedKey.classList.add('wrong-highlight');
+                    setTimeout(() => {
+                        clickedKey.classList.remove('wrong-highlight');
+                    }, 500);
+                }
+            }
+        }
+
+        keyElements.forEach(key => {
+            key.addEventListener('click', () => {
+                handleUserInput(parseFloat(key.dataset.freq));
+            });
+        });
+
+        function updateScore() {
+            document.getElementById('score').textContent = `Score: ${score}`;
+            if (score > highScore) {
+                highScore = score;
+                document.getElementById('high-score').textContent = `High Score: ${highScore}`;
+            }
+        }
+
+        function updateTimer() {
+            if (timeLeft >= 0) {
+                document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
+            }
+        }
+
+        function startGame() {
+            score = 0;
+            timeLeft = 90;
+            updateScore();
+            updateTimer();
+            playTargetNote();
+            document.getElementById('play-again-button').style.display = 'none';
+            document.getElementById('feedback').textContent = "";
+            inputEnabled = true;
+            keyElements.forEach(key => key.style.pointerEvents = 'auto');
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('feedback').textContent = "";
+                    document.getElementById('play-again-button').style.display = 'block';
+                    inputEnabled = false;
+                    keyElements.forEach(key => key.style.pointerEvents = 'none');
+                }
+            }, 1000);
+        }
+
+        document.getElementById('start-game-button').addEventListener('click', startGame);
+        document.getElementById('recap-button').addEventListener('click', () => {
+            if (targetFrequency) {
+                playNote(targetFrequency);
+            }
+        });
+        document.getElementById('play-again-button').addEventListener('click', startGame);
+        document.getElementById('play-all-notes-button').addEventListener('click', () => {
+            let delay = 0;
+            allFrequencies.forEach((freq) => {
+                setTimeout(() => {
+                    playNote(freq);
+                    highlightKey(freq);
+                }, delay);
+                delay += 600;
+            });
+        });
+
+        function highlightKey(frequency) {
+            keyElements.forEach(key => {
+                if (parseFloat(key.dataset.freq) === frequency) {
+                    key.classList.add('highlighted');
+                    setTimeout(() => {
+                        key.classList.remove('highlighted');
+                    }, 500);
+                }
+            });
+        }
+
+        function highlightCorrectKey() {
+            keyElements.forEach(key => {
+                if (parseFloat(key.dataset.freq) === targetFrequency) {
+                    key.classList.add('highlighted');
+                    setTimeout(() => {
+                        key.classList.remove('highlighted');
+                    }, 500);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
