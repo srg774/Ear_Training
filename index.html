@@ -188,33 +188,33 @@ button {
         <div class="keyboard">
             <div class="octave">
                 <div class="octave-label c4-label">C4</div>
-                <div class="white" data-freq="261.63">C</div>
-                <div class="black c-sharp" data-freq="277.18">C#<br>D♭</div>
-                <div class="white" data-freq="293.66">D</div>
-                <div class="black d-sharp" data-freq="311.13">D#<br>E♭</div>
-                <div class="white" data-freq="329.63">E</div>
-                <div class="white" data-freq="349.23">F</div>
-                <div class="black f-sharp" data-freq="369.99">F#<br>G♭</div>
-                <div class="white" data-freq="392.00">G</div>
-                <div class="black g-sharp" data-freq="415.30">G#<br>A♭</div>
-                <div class="white" data-freq="440.00">A</div>
-                <div class="black a-sharp" data-freq="466.16">A#<br>B♭</div>
-                <div class="white" data-freq="493.88">B</div>
+                <div class="white" data-note="C4">C</div>
+                <div class="black c-sharp" data-note="C#4">C#<br>D♭</div>
+                <div class="white" data-note="D4">D</div>
+                <div class="black d-sharp" data-note="D#4">D#<br>E♭</div>
+                <div class="white" data-note="E4">E</div>
+                <div class="white" data-note="F4">F</div>
+                <div class="black f-sharp" data-note="F#4">F#<br>G♭</div>
+                <div class="white" data-note="G4">G</div>
+                <div class="black g-sharp" data-note="G#4">G#<br>A♭</div>
+                <div class="white" data-note="A4">A</div>
+                <div class="black a-sharp" data-note="A#4">A#<br>B♭</div>
+                <div class="white" data-note="B4">B</div>
             </div>
             <div class="octave">
                 <div class="octave-label c5-label">C5</div>
-                <div class="white" data-freq="523.25">C</div>
-                <div class="black c-sharp" data-freq="554.37">C#<br>D♭</div>
-                <div class="white" data-freq="587.33">D</div>
-                <div class="black d-sharp" data-freq="622.25">D#<br>E♭</div>
-                <div class="white" data-freq="659.26">E</div>
-                <div class="white" data-freq="698.46">F</div>
-                <div class="black f-sharp" data-freq="739.99">F#<br>G♭</div>
-                <div class="white" data-freq="783.99">G</div>
-                <div class="black g-sharp" data-freq="830.61">G#<br>A♭</div>
-                <div class="white" data-freq="880.00">A</div>
-                <div class="black a-sharp" data-freq="932.33">A#<br>B♭</div>
-                <div class="white" data-freq="987.77">B</div>
+                <div class="white" data-note="C5">C</div>
+                <div class="black c-sharp" data-note="C#5">C#<br>D♭</div>
+                <div class="white" data-note="D5">D</div>
+                <div class="black d-sharp" data-note="D#5">D#<br>E♭</div>
+                <div class="white" data-note="E5">E</div>
+                <div class="white" data-note="F5">F</div>
+                <div class="black f-sharp" data-note="F#5">F#<br>G♭</div>
+                <div class="white" data-note="G5">G</div>
+                <div class="black g-sharp" data-note="G#5">G#<br>A♭</div>
+                <div class="white" data-note="A5">A</div>
+                <div class="black a-sharp" data-note="A#5">A#<br>B♭</div>
+                <div class="white" data-note="B5">B</div>
             </div>
         </div>
     </div>
@@ -234,6 +234,33 @@ button {
     <p id="feedback"></p>
 
     <script>
+        const noteFiles = {
+            "C4": "Assets/C4.wav",
+            "C#4": "Assets/C#4.wav",
+            "D4": "Assets/D4.wav",
+            "D#4": "Assets/D#4.wav",
+            "E4": "Assets/E4.wav",
+            "F4": "Assets/F4.wav",
+            "F#4": "Assets/F#4.wav",
+            "G4": "Assets/G4.wav",
+            "G#4": "Assets/G#4.wav",
+            "A4": "Assets/A4.wav",
+            "A#4": "Assets/A#4.wav",
+            "B4": "Assets/B4.wav",
+            "C5": "Assets/C5.wav",
+            "C#5": "Assets/C#5.wav",
+            "D5": "Assets/D5.wav",
+            "D#5": "Assets/D#5.wav",
+            "E5": "Assets/E5.wav",
+            "F5": "Assets/F5.wav",
+            "F#5": "Assets/F#5.wav",
+            "G5": "Assets/G5.wav",
+            "G#5": "Assets/G#5.wav",
+            "A5": "Assets/A5.wav",
+            "A#5": "Assets/A#5.wav",
+            "B5": "Assets/B5.wav"
+        };
+
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let score = 0;
         let highScore = 0;
@@ -241,85 +268,18 @@ button {
         let timer;
         let targetFrequency;
         let inputEnabled = true;
-        const orientationOverlay = document.getElementById('orientation-overlay');
-        const keyboardContainer = document.querySelector('.keyboard-container');
-        const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
-        const keyElements = document.querySelectorAll('.white, .black');
+        const keyElements = document.querySelectorAll(".keyboard .white, .keyboard .black");
+        const feedbackEl = document.getElementById("feedback");
 
-        function isMobileOrTablet() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-
-        function checkOrientation() {
-            if (isMobileOrTablet()) {
-                if (window.innerWidth < window.innerHeight) {
-                    orientationOverlay.style.display = 'flex';
-                    keyboardContainer.style.display = 'none';
-                    document.getElementById('top-bar').style.display = 'none';
-                } else {
-                    orientationOverlay.style.display = 'none';
-                    keyboardContainer.style.display = 'flex';
-                    document.getElementById('top-bar').style.display = 'flex';
-                }
-            } else {
-                orientationOverlay.style.display = 'none';
-                keyboardContainer.style.display = 'flex';
-                document.getElementById('top-bar').style.display = 'flex';
-            }
-        }
-
-        window.addEventListener('resize', checkOrientation);
-        window.addEventListener('orientationchange', checkOrientation);
-        document.addEventListener('DOMContentLoaded', checkOrientation);
-
-        function generateRandomFrequency() {
-            return allFrequencies[Math.floor(Math.random() * allFrequencies.length)];
-        }
-
-        function playNote(frequency) {
-            const oscillator = audioCtx.createOscillator();
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-            const gainNode = audioCtx.createGain();
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.5);
-        }
-
-        function playAwardSound() {
-            const oscillator = audioCtx.createOscillator();
-            oscillator.type = 'triangle';
-            oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
-            oscillator.frequency.setValueAtTime(700, audioCtx.currentTime + 0.2);
-            oscillator.connect(audioCtx.destination);
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.4);
-        }
-
-        function playDudSound() {
-            const oscillator = audioCtx.createOscillator();
-            oscillator.type = 'sawtooth';
-            oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
-            oscillator.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.5);
-            const gainNode = audioCtx.createGain();
-            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.5);
-        }
-
-        function playTargetNote() {
-            targetFrequency = generateRandomFrequency();
-            playNote(targetFrequency);
+        function playNote(note) {
+            const audio = new Audio(noteFiles[note]);
+            audio.play();
         }
 
         function handleUserInput(frequency) {
             if (!inputEnabled) return;
 
-            const clickedKey = Array.from(keyElements).find(key => parseFloat(key.dataset.freq) === frequency);
+            const clickedKey = Array.from(keyElements).find(key => key.dataset.note === frequency);
 
             if (targetFrequency === frequency) {
                 score++;
@@ -345,88 +305,91 @@ button {
             }
         }
 
-        keyElements.forEach(key => {
-            key.addEventListener('click', () => {
-                handleUserInput(parseFloat(key.dataset.freq));
-            });
-        });
+        function playTargetNote() {
+            const allNotes = Object.keys(noteFiles);
+            const randomNote = allNotes[Math.floor(Math.random() * allNotes.length)];
+            targetFrequency = randomNote;
+            playNote(randomNote);
+        }
+
+        function playAwardSound() {
+            const awardSound = new Audio("Assets/award-sound.wav");
+            awardSound.play();
+        }
+
+        function playDudSound() {
+            const dudSound = new Audio("Assets/dud-sound.wav");
+            dudSound.play();
+        }
 
         function updateScore() {
-            document.getElementById('score').textContent = `Score: ${score}`;
-            if (score > highScore) {
-                highScore = score;
-                document.getElementById('high-score').textContent = `High Score: ${highScore}`;
+            document.getElementById("score").textContent = "Score: " + score;
+        }
+
+        function highlightCorrectKey() {
+            const correctKey = Array.from(keyElements).find(key => key.dataset.note === targetFrequency);
+            if (correctKey) {
+                correctKey.classList.add('highlighted');
+                setTimeout(() => {
+                    correctKey.classList.remove('highlighted');
+                }, 500);
             }
         }
 
-        function updateTimer() {
-            if (timeLeft >= 0) {
-                document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
-            }
-        }
-
-        function startGame() {
-            score = 0;
-            timeLeft = 90;
-            updateScore();
-            updateTimer();
-            playTargetNote();
-            document.getElementById('play-again-button').style.display = 'none';
-            document.getElementById('feedback').textContent = "";
-            inputEnabled = true;
-            keyElements.forEach(key => key.style.pointerEvents = 'auto');
-            timer = setInterval(() => {
-                timeLeft--;
-                updateTimer();
+        function startTimer() {
+            timer = setInterval(function() {
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    document.getElementById('feedback').textContent = "";
-                    document.getElementById('play-again-button').style.display = 'block';
-                    inputEnabled = false;
-                    keyElements.forEach(key => key.style.pointerEvents = 'none');
+                    endGame();
+                } else {
+                    timeLeft--;
+                    document.getElementById("time-remaining").textContent = "Time: " + timeLeft;
                 }
             }, 1000);
         }
 
-        document.getElementById('start-game-button').addEventListener('click', startGame);
-        document.getElementById('recap-button').addEventListener('click', () => {
+        function endGame() {
+            if (score > highScore) {
+                highScore = score;
+            }
+            document.getElementById("high-score").textContent = "High Score: " + highScore;
+            feedbackEl.textContent = "Game Over! Final Score: " + score;
+        }
+
+        keyElements.forEach(key => {
+            key.addEventListener("click", () => {
+                const frequency = key.dataset.note;
+                handleUserInput(frequency);
+            });
+        });
+
+        document.getElementById("start-game-button").addEventListener("click", () => {
+            score = 0;
+            timeLeft = 90;
+            updateScore();
+            document.getElementById("time-remaining").textContent = "Time: " + timeLeft;
+            startTimer();
+            playTargetNote();
+        });
+
+        document.getElementById("play-all-notes-button").addEventListener("click", () => {
+            const allNotes = Object.keys(noteFiles);
+            let i = 0;
+            const playNext = () => {
+                if (i < allNotes.length) {
+                    playNote(allNotes[i]);
+                    i++;
+                    setTimeout(playNext, 500); // Play next note after half a second
+                }
+            };
+            playNext();
+        });
+
+        document.getElementById("recap-button").addEventListener("click", () => {
             if (targetFrequency) {
                 playNote(targetFrequency);
             }
         });
-        document.getElementById('play-again-button').addEventListener('click', startGame);
-        document.getElementById('play-all-notes-button').addEventListener('click', () => {
-            let delay = 0;
-            allFrequencies.forEach((freq) => {
-                setTimeout(() => {
-                    playNote(freq);
-                    highlightKey(freq);
-                }, delay);
-                delay += 600;
-            });
-        });
-
-        function highlightKey(frequency) {
-            keyElements.forEach(key => {
-                if (parseFloat(key.dataset.freq) === frequency) {
-                    key.classList.add('highlighted');
-                    setTimeout(() => {
-                        key.classList.remove('highlighted');
-                    }, 500);
-                }
-            });
-        }
-
-        function highlightCorrectKey() {
-            keyElements.forEach(key => {
-                if (parseFloat(key.dataset.freq) === targetFrequency) {
-                    key.classList.add('highlighted');
-                    setTimeout(() => {
-                        key.classList.remove('highlighted');
-                    }, 500);
-                }
-            });
-        }
     </script>
 </body>
 </html>
