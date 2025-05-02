@@ -158,33 +158,33 @@
         <div class="keyboard">
             <div class="octave">
                 <div class="octave-label c4-label">C4</div>
-                <div class="white" data-note="C4">C</div>
-                <div class="black c-sharp" data-note="C4-sharp">C#<br>D♭</div>
-                <div class="white" data-note="D4">D</div>
-                <div class="black d-sharp" data-note="D4-sharp">D#<br>E♭</div>
-                <div class="white" data-note="E4">E</div>
-                <div class="white" data-note="F4">F</div>
-                <div class="black f-sharp" data-note="F4-sharp">F#<br>G♭</div>
-                <div class="white" data-note="G4">G</div>
-                <div class="black g-sharp" data-note="G4-sharp">G#<br>A♭</div>
-                <div class="white" data-note="A4">A</div>
-                <div class="black a-sharp" data-note="A4-sharp">A#<br>B♭</div>
-                <div class="white" data-note="B4">B</div>
+                <div class="white" data-freq="261.63">C</div>
+                <div class="black c-sharp" data-freq="277.18">C#<br>D♭</div>
+                <div class="white" data-freq="293.66">D</div>
+                <div class="black d-sharp" data-freq="311.13">D#<br>E♭</div>
+                <div class="white" data-freq="329.63">E</div>
+                <div class="white" data-freq="349.23">F</div>
+                <div class="black f-sharp" data-freq="369.99">F#<br>G♭</div>
+                <div class="white" data-freq="392.00">G</div>
+                <div class="black g-sharp" data-freq="415.30">G#<br>A♭</div>
+                <div class="white" data-freq="440.00">A</div>
+                <div class="black a-sharp" data-freq="466.16">A#<br>B♭</div>
+                <div class="white" data-freq="493.88">B</div>
             </div>
             <div class="octave">
                 <div class="octave-label c5-label">C5</div>
-                <div class="white" data-note="C5">C</div>
-                <div class="black c-sharp" data-note="C5-sharp">C#<br>D♭</div>
-                <div class="white" data-note="D5">D</div>
-                <div class="black d-sharp" data-note="D5-sharp">D#<br>E♭</div>
-                <div class="white" data-note="E5">E</div>
-                <div class="white" data-note="F5">F</div>
-                <div class="black f-sharp" data-note="F5-sharp">F#<br>G♭</div>
-                <div class="white" data-note="G5">G</div>
-                <div class="black g-sharp" data-note="G5-sharp">G#<br>A♭</div>
-                <div class="white" data-note="A5">A</div>
-                <div class="black a-sharp" data-note="A5-sharp">A#<br>B♭</div>
-                <div class="white" data-note="B5">B</div>
+                <div class="white" data-freq="523.25">C</div>
+                <div class="black c-sharp" data-freq="554.37">C#<br>D♭</div>
+                <div class="white" data-freq="587.33">D</div>
+                <div class="black d-sharp" data-freq="622.25">D#<br>E♭</div>
+                <div class="white" data-freq="659.26">E</div>
+                <div class="white" data-freq="698.46">F</div>
+                <div class="black f-sharp" data-freq="739.99">F#<br>G♭</div>
+                <div class="white" data-freq="783.99">G</div>
+                <div class="black g-sharp" data-freq="830.61">G#<br>A♭</div>
+                <div class="white" data-freq="880.00">A</div>
+                <div class="black a-sharp" data-freq="932.33">A#<br>B♭</div>
+                <div class="white" data-freq="987.77">B</div>
             </div>
         </div>
     </div>
@@ -202,43 +202,16 @@
     <p id="feedback"></p>
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const noteBuffers = {};
         let score = 0;
         let highScore = 0;
         let timeLeft = 90;
         let timer;
-        let targetNote;
+        let targetFrequency;
         let inputEnabled = true;
         const orientationOverlay = document.getElementById('orientation-overlay');
         const keyboardContainer = document.querySelector('.keyboard-container');
+        const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
         const keyElements = document.querySelectorAll('.white, .black');
-        const allNotes = [
-            "C4", "C4-sharp", "D4", "D4-sharp", "E4", "F4", "F4-sharp", "G4", "G4-sharp", "A4", "A4-sharp", "B4",
-            "C5", "C5-sharp", "D5", "D5-sharp", "E5", "F5", "F5-sharp", "G5", "G5-sharp", "A5", "A5-sharp", "B5"
-        ];
-        const noteFiles = {
-            "C4": "Assets/C4.wav", "C4-sharp": "Assets/C4-sharp.wav", "D4": "Assets/D4.wav",
-            "D4-sharp": "Assets/D4-sharp.wav", "E4": "Assets/E4.wav", "F4": "Assets/F4.wav",
-            "F4-sharp": "Assets/F4-sharp.wav", "G4": "Assets/G4.wav", "G4-sharp": "Assets/G4-sharp.wav",
-            "A4": "Assets/A4.wav", "A4-sharp": "Assets/A4-sharp.wav", "B4": "Assets/B4.wav",
-            "C5": "Assets/C5.wav", "C5-sharp": "Assets/C5-sharp.wav", "D5": "Assets/D5.wav",
-            "D5-sharp": "Assets/D5-sharp.wav", "E5": "E5.wav", "F5": "F5.wav",
-            "F5-sharp": "Assets/F5-sharp.wav", "G5": "Assets/G5.wav", "G5-sharp": "Assets/G5-sharp.wav",
-            "A5": "Assets/A5.wav", "A5-sharp": "Assets/A5-sharp.wav", "B5": "Assets/B5.wav"
-        };
-
-        async function loadBuffers() {
-            for (const note in noteFiles) {
-                try {
-                    const response = await fetch(noteFiles[note]);
-                    const arrayBuffer = await response.arrayBuffer();
-                    noteBuffers[note] = await audioCtx.decodeAudioData(arrayBuffer);
-                } catch (error) {
-                    console.error(`Error loading audio file for ${note}:`, error);
-                }
-            }
-            console.log("Note Buffers Loaded:", noteBuffers); // Debugging: Check if buffers loaded
-        }
 
         function isMobileOrTablet() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -264,69 +237,56 @@
 
         window.addEventListener('resize', checkOrientation);
         window.addEventListener('orientationchange', checkOrientation);
-        document.addEventListener('DOMContentLoaded', () => {
-            checkOrientation();
-            loadBuffers(); // Initiate loading audio buffers
-        });
+        document.addEventListener('DOMContentLoaded', checkOrientation);
 
-        function playNote(note) {
-            if (noteBuffers[note]) {
-                const source = audioCtx.createBufferSource();
-                source.buffer = noteBuffers[note];
-                source.connect(audioCtx.destination);
-                source.start();
-            } else {
-                console.warn(`No buffer loaded for note: ${note}`); // Debugging: Check if buffer exists
-            }
+        function generateRandomFrequency() {
+            return allFrequencies[Math.floor(Math.random() * allFrequencies.length)];
+        }
+
+        function playNote(frequency) {
+            const oscillator = audioCtx.createOscillator();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.5);
         }
 
         function playAwardSound() {
-            const now = audioCtx.currentTime;
-            const osc1 = audioCtx.createOscillator();
-            const osc2 = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc1.type = 'sine';
-            osc2.type = 'sine';
-            osc1.frequency.setValueAtTime(440, now);
-            osc2.frequency.setValueAtTime(660, now);
-            gainNode.gain.setValueAtTime(0.3, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-            osc1.connect(gainNode);
-            osc2.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            osc1.start(now);
-            osc2.start(now + 0.05);
-            osc1.stop(now + 0.8);
-            osc2.stop(now + 0.85);
+            const oscillator = audioCtx.createOscillator();
+            oscillator.type = 'triangle';
+            oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
+            oscillator.frequency.setValueAtTime(700, audioCtx.currentTime + 0.2);
+            oscillator.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.4);
         }
 
         function playDudSound() {
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
+            const oscillator = audioCtx.createOscillator();
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.5);
             const gainNode = audioCtx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(220, now);
-            gainNode.gain.setValueAtTime(0.4, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
-            osc.connect(gainNode);
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-            osc.start(now);
-            osc.stop(now + 0.7);
-        }
-
-        function generateRandomNote() {
-            return allNotes[Math.floor(Math.random() * allNotes.length)];
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.5);
         }
 
         function playTargetNote() {
-            targetNote = generateRandomNote();
-            playNote(targetNote);
+            targetFrequency = generateRandomFrequency();
+            playNote(targetFrequency);
         }
 
-        function handleUserInput(note) {
+        function handleUserInput(frequency) {
             if (!inputEnabled) return;
-            const clickedKey = Array.from(keyElements).find(key => key.dataset.note === note);
-            if (targetNote === note) {
+            const clickedKey = Array.from(keyElements).find(key => parseFloat(key.dataset.freq) === frequency);
+            if (Math.abs(targetFrequency - frequency) < 0.1) { // Allow for very small floating-point differences
                 score++;
                 playAwardSound();
                 updateScore();
@@ -336,7 +296,7 @@
                     setTimeout(() => {
                         playTargetNote();
                         inputEnabled = true;
-                    }, 1000);
+                    }, 600);
                 }
             } else {
                 playDudSound();
@@ -352,7 +312,7 @@
 
         keyElements.forEach(key => {
             key.addEventListener('click', () => {
-                handleUserInput(key.dataset.note);
+                handleUserInput(parseFloat(key.dataset.freq));
             });
         });
 
@@ -365,7 +325,49 @@
         }
 
         function updateTimer() {
-            document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
+            if (timeLeft >= 0) {
+                document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
+            }
         }
 
-        function startGame
+        function startGame() {
+            score = 0;
+            timeLeft = 90;
+            updateScore();
+            updateTimer();
+            playTargetNote();
+            document.getElementById('play-again-button').style.display = 'none';
+            document.getElementById('feedback').textContent = "";
+            inputEnabled = true;
+            keyElements.forEach(key => key.style.pointerEvents = 'auto');
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('feedback').textContent = "Time's up!";
+                    document.getElementById('play-again-button').style.display = 'block';
+                    inputEnabled = false;
+                    keyElements.forEach(key => key.style.pointerEvents = 'none');
+                }
+            }, 1000);
+            // Hide the overlay when the game starts
+            document.getElementById('orientation-overlay').style.display = 'none';
+            keyboardContainer.style.display = 'flex';
+            document.getElementById('top-bar').style.display = 'flex';
+        }
+
+        document.getElementById('start-game-button').addEventListener('click', startGame);
+        document.getElementById('recap-button').addEventListener('click', () => {
+            if (targetFrequency) {
+                playNote(targetFrequency);
+            }
+        });
+        document.getElementById('play-again-button').addEventListener('click', startGame);
+        document.getElementById('play-all-notes-button').addEventListener('click', () => {
+            let delay = 0;
+            allFrequencies.forEach((freq) => {
+                setTimeout(() => {
+                    playNote(freq);
+                    highlightKey(freq);
+                }, delay);
