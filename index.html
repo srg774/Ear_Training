@@ -244,7 +244,6 @@ button {
         const orientationOverlay = document.getElementById('orientation-overlay');
         const keyboardContainer = document.querySelector('.keyboard-container');
         const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
-        const noteNames = ["C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4", "C5", "C#5", "D5", "D#5", "E5", "F5", "F#5", "G5", "G#5", "A5", "A#5", "B5"];
         const keyElements = document.querySelectorAll('.white, .black');
 
         function isMobileOrTablet() {
@@ -277,18 +276,16 @@ button {
             return allFrequencies[Math.floor(Math.random() * allFrequencies.length)];
         }
 
-        async function playNote(noteName) {
-            try {
-                const response = await fetch(`Assets/${noteName}.wav`);
-                const arrayBuffer = await response.arrayBuffer();
-                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-                const source = audioCtx.createBufferSource();
-                source.buffer = audioBuffer;
-                source.connect(audioCtx.destination);
-                source.start();
-            } catch (error) {
-                console.error("Error loading or playing audio:", error);
-            }
+        function playNote(frequency) {
+            const oscillator = audioCtx.createOscillator();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.5);
         }
 
         function playAwardSound() {
@@ -314,35 +311,25 @@ button {
             oscillator.stop(audioCtx.currentTime + 0.5);
         }
 
-        function noteFromFrequency(frequency) {
-            const index = allFrequencies.indexOf(frequency);
-            return index !== -1 ? noteNames[index] : null;
-        }
-
-        async function playTargetNote() {
+        function playTargetNote() {
             targetFrequency = generateRandomFrequency();
-            const noteName = noteFromFrequency(targetFrequency);
-            if (noteName) {
-                await playNote(noteName);
-            }
+            playNote(targetFrequency);
         }
 
-        async function handleUserInput(frequency) {
+        function handleUserInput(frequency) {
             if (!inputEnabled) return;
 
             const clickedKey = Array.from(keyElements).find(key => parseFloat(key.dataset.freq) === frequency);
-            const clickedNoteName = noteFromFrequency(frequency);
-            const targetNoteName = noteFromFrequency(targetFrequency);
 
-            if (clickedNoteName === targetNoteName) {
+            if (targetFrequency === frequency) {
                 score++;
                 playAwardSound();
                 updateScore();
                 highlightCorrectKey();
                 if (timeLeft > 0) {
                     inputEnabled = false;
-                    setTimeout(async () => {
-                        await playTargetNote();
+                    setTimeout(() => {
+                        playTargetNote();
                         inputEnabled = true;
                     }, 600);
                 }
@@ -401,4 +388,45 @@ button {
             }, 1000);
         }
 
-        document.getElementById('start-game-button').addEventListener('click',
+        document.getElementById('start-game-button').addEventListener('click', startGame);
+        document.getElementById('recap-button').addEventListener('click', () => {
+            if (targetFrequency) {
+                playNote(targetFrequency);
+            }
+        });
+        document.getElementById('play-again-button').addEventListener('click', startGame);
+        document.getElementById('play-all-notes-button').addEventListener('click', () => {
+            let delay = 0;
+            allFrequencies.forEach((freq) => {
+                setTimeout(() => {
+                    playNote(freq);
+                    highlightKey(freq);
+                }, delay);
+                delay += 600;
+            });
+        });
+
+        function highlightKey(frequency) {
+            keyElements.forEach(key => {
+                if (parseFloat(key.dataset.freq) === frequency) {
+                    key.classList.add('highlighted');
+                    setTimeout(() => {
+                        key.classList.remove('highlighted');
+                    }, 500);
+                }
+            });
+        }
+
+        function highlightCorrectKey() {
+            keyElements.forEach(key => {
+                if (parseFloat(key.dataset.freq) === targetFrequency) {
+                    key.classList.add('highlighted');
+                    setTimeout(() => {
+                        key.classList.remove('highlighted');
+                    }, 500);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
