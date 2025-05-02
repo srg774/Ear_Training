@@ -66,7 +66,7 @@
       for (let note of notes) {
         try {
           await playNote(note);
-          await new Promise(r => setTimeout(r, 75)); // Slightly adjusted delay for niceness
+          await new Promise(r => setTimeout(r, 35)); // Slightly adjusted delay for niceness
         } catch (err) {
           console.error(err);
         }
