@@ -2,9 +2,7 @@
 <html>
 <head>
     <title>Ear Training Game</title>
-
     <meta name="viewport" content="width=device-width, initial-scale=0.8, maximum-scale=0.8, user-scalable=no">
-
     <style>
         body {
             display: flex;
@@ -73,21 +71,11 @@
             transition: background-color 0.3s ease;
         }
 
-        .c-sharp {left: 60px;}
-        .d-sharp {left: 122px;}
-        .f-sharp {left: 246px;}
-        .g-sharp {left: 307px;}
-        .a-sharp {left: 368px;}
-
-        .octave-label {
-            position: absolute;
-            top: -22px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .c4-label {color: blue;}
-        .c5-label {color: red;}
+        .c-sharp { left: 60px; }
+        .d-sharp { left: 122px; }
+        .f-sharp { left: 246px; }
+        .g-sharp { left: 307px; }
+        .a-sharp { left: 368px; }
 
         #top-bar {
             display: flex;
@@ -146,35 +134,35 @@
         #orientation-overlay p {
             margin: 20px;
         }
+
         /* Bigger overlay text */
-#orientation-overlay {
-    font-size: 28px;
-}
+        #orientation-overlay {
+            font-size: 28px;
+        }
 
-#orientation-overlay p {
-    font-size: 32px;
-}
+        #orientation-overlay p {
+            font-size: 32px;
+        }
 
-/* Rounder and larger buttons */
-#game-controls button,
-button {
-    border-radius: 12px;     /* Adjust roundness here */
-    padding: 10px 18px;      /* Adjust button size here */
-    font-size: 16px;         /* Optional: slightly larger text */
-    cursor: pointer;         /* Optional: shows pointer on hover */
-    transition: background-color 0.3s ease;
-}
+        /* Rounder and larger buttons */
+        #game-controls button,
+        button {
+            border-radius: 12px;
+            padding: 10px 18px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
         #score,
-#high-score,
-#time-remaining {
-    font-size: 22px; /* or any size you like */
-    font-weight: bold;
-}
-
+        #high-score,
+        #time-remaining {
+            font-size: 22px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-
     <div id="orientation-overlay" style="display: none;">
         <p>Please rotate your device to landscape mode for the best experience.</p>
         <svg viewBox="0 0 64 32" width="64" height="32" fill="white">
@@ -240,16 +228,21 @@ button {
         let timeLeft = 90;
         let timer;
         let targetFrequency;
-        let inputEnabled = false; // Initially disabled until audio loads
+        let inputEnabled = false;
         const orientationOverlay = document.getElementById('orientation-overlay');
         const keyboardContainer = document.querySelector('.keyboard-container');
-        const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
+        const allFrequencies = [
+            261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00,
+            466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99,
+            830.61, 880.00, 932.33, 987.77
+        ];
         const keyElements = document.querySelectorAll('.white, .black');
         const noteBuffers = {};
         let rewardSoundBuffer;
         let mistakeSoundBuffer;
-        let audioLoaded = false; // Flag to track if audio is loaded
+        let audioLoaded = false;
 
+        // Load audio for the frequencies and sound effects
         async function loadAudio(url) {
             try {
                 const response = await fetch(url);
@@ -264,6 +257,7 @@ button {
             }
         }
 
+        // Load the note buffers and sound effects
         async function loadNoteBuffers() {
             const loadPromises = allFrequencies.map(async (freq) => {
                 noteBuffers[freq] = await loadAudio(`Assets/${freq}.wav`);
@@ -277,7 +271,6 @@ button {
             allFrequencies.forEach((freq, index) => {
                 if (!results[index]) {
                     console.error(`Failed to load audio for frequency: ${freq}`);
-                    return;
                 }
             });
             rewardSoundBuffer = results[allFrequencies.length];
@@ -285,13 +278,14 @@ button {
 
             if (rewardSoundBuffer && mistakeSoundBuffer && Object.keys(noteBuffers).length === allFrequencies.length) {
                 audioLoaded = true;
-                inputEnabled = true; // Enable input once all audio is loaded
+                inputEnabled = true;
                 console.log('All audio loaded successfully.');
             } else {
                 console.error('Not all audio files loaded correctly.');
             }
         }
 
+        // Play sound function
         function playSound(buffer) {
             if (buffer && audioCtx.state === 'running') {
                 const source = audioCtx.createBufferSource();
@@ -299,121 +293,24 @@ button {
                 source.connect(audioCtx.destination);
                 source.start();
             } else if (buffer && audioCtx.state !== 'running') {
-                console.warn('Audio context is not running.');
+                audioCtx.resume().then(() => {
+                    const source = audioCtx.createBufferSource();
+                    source.buffer = buffer;
+                    source.connect(audioCtx.destination);
+                    source.start();
+                });
             }
         }
 
-        function playNote(frequency) {
-            playSound(noteBuffers[frequency]);
-        }
+        // Start the game when "Start Game" is clicked
+        document.getElementById('start-game-button').addEventListener('click', startGame);
 
-        function playAwardSound() {
-            playSound(rewardSoundBuffer);
-        }
-
-        function playDudSound() {
-            playSound(mistakeSoundBuffer);
-        }
-
-        function isMobileOrTablet() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-
-        function checkOrientation() {
-            if (isMobileOrTablet()) {
-                if (window.innerWidth < window.innerHeight) {
-                    orientationOverlay.style.display = 'flex';
-                    keyboardContainer.style.display = 'none';
-                    document.getElementById('top-bar').style.display = 'none';
-                } else {
-                    orientationOverlay.style.display = 'none';
-                    keyboardContainer.style.display = 'flex';
-                    document.getElementById('top-bar').style.display = 'flex';
-                }
-            } else {
-                orientationOverlay.style.display = 'none';
-                keyboardContainer.style.display = 'flex';
-                document.getElementById('top-bar').style.display = 'flex';
-            }
-        }
-
-        window.addEventListener('resize', checkOrientation);
-        window.addEventListener('orientationchange', checkOrientation);
-        document.addEventListener('DOMContentLoaded', () => {
-            checkOrientation();
-            loadNoteBuffers(); // Load audio files when the page loads
+        // Recap function to play target note
+        document.getElementById('recap-button').addEventListener('click', () => {
+            if (inputEnabled) playSound(noteBuffers[targetFrequency]);
         });
 
-        function generateRandomFrequency() {
-            return allFrequencies[Math.floor(Math.random() * allFrequencies.length)];
-        }
-
-        function playTargetNote() {
-            if (audioLoaded) {
-                targetFrequency = generateRandomFrequency();
-                playNote(targetFrequency);
-            } else {
-                console.warn('Audio not loaded yet, cannot play target note.');
-            }
-        }
-
-        function handleUserInput(frequency) {
-            if (!inputEnabled) return;
-
-            const clickedKey = Array.from(keyElements).find(key => parseFloat(key.dataset.freq) === frequency);
-
-            if (targetFrequency === frequency) {
-                score++;
-                playAwardSound();
-                updateScore();
-                highlightCorrectKey();
-                if (timeLeft > 0) {
-                    inputEnabled = false;
-                    setTimeout(() => {
-                        playTargetNote();
-                        inputEnabled = true;
-                    }, 600);
-                }
-            } else {
-                playDudSound();
-                updateScore();
-                if (clickedKey) {
-                    clickedKey.classList.add('wrong-highlight');
-                    setTimeout(() => {
-                        clickedKey.classList.remove('wrong-highlight');
-                    }, 500);
-                }
-            }
-        }
-
-        keyElements.forEach(key => {
-            key.addEventListener('click', () => {
-                // Resume audio context on first interaction
-                if (audioCtx.state !== 'running') {
-                    audioCtx.resume().then(() => {
-                        console.log('Audio context resumed.');
-                        handleUserInput(parseFloat(key.dataset.freq));
-                    });
-                } else {
-                    handleUserInput(parseFloat(key.dataset.freq));
-                }
-            });
-        });
-
-        function updateScore() {
-            document.getElementById('score').textContent = `Score: ${score}`;
-            if (score > highScore) {
-                highScore = score;
-                document.getElementById('high-score').textContent = `High Score: ${highScore}`;
-            }
-        }
-
-        function updateTimer() {
-            if (timeLeft >= 0) {
-                document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
-            }
-        }
-
+        // Start the game function
         function startGame() {
             if (audioLoaded) {
                 score = 0;
@@ -429,3 +326,74 @@ button {
                 timer = setInterval(() => {
                     timeLeft--;
                     updateTimer();
+                }, 1000);
+            }
+        }
+
+        // Update the score display
+        function updateScore() {
+            document.getElementById('score').textContent = `Score: ${score}`;
+            if (score > highScore) {
+                highScore = score;
+                document.getElementById('high-score').textContent = `High Score: ${highScore}`;
+            }
+        }
+
+        // Update the timer display
+        function updateTimer() {
+            document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                inputEnabled = false;
+                document.getElementById('feedback').textContent = `Game Over! Final Score: ${score}`;
+                document.getElementById('play-again-button').style.display = 'inline-block';
+            }
+        }
+
+        // Play a random target note for the game
+        function playTargetNote() {
+            targetFrequency = allFrequencies[Math.floor(Math.random() * allFrequencies.length)];
+            console.log('Target frequency:', targetFrequency);
+            playSound(noteBuffers[targetFrequency]);
+        }
+
+        // Check if the key pressed matches the target frequency
+        keyElements.forEach((key) => {
+            key.addEventListener('click', function () {
+                if (inputEnabled) {
+                    const frequency = parseFloat(key.getAttribute('data-freq'));
+                    if (frequency === targetFrequency) {
+                        score++;
+                        playSound(rewardSoundBuffer);
+                        updateScore();
+                        playTargetNote();
+                    } else {
+                        score--;
+                        playSound(mistakeSoundBuffer);
+                        updateScore();
+                    }
+                }
+            });
+        });
+
+        // Handle device rotation detection
+        window.addEventListener('orientationchange', function () {
+            if (window.innerHeight > window.innerWidth) {
+                orientationOverlay.style.display = 'flex';
+            } else {
+                orientationOverlay.style.display = 'none';
+            }
+        });
+
+        // Initial check for orientation on page load
+        if (window.innerHeight > window.innerWidth) {
+            orientationOverlay.style.display = 'flex';
+        } else {
+            orientationOverlay.style.display = 'none';
+        }
+
+        // Load all necessary audio files when the page loads
+        window.onload = loadNoteBuffers;
+    </script>
+</body>
+</html>
