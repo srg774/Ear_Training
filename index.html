@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <title>Chromatic Sweep</title>
   <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
     button {
       margin-right: 10px;
       padding: 10px 15px;
@@ -18,6 +22,7 @@
 </head>
 <body>
   <h1>Chromatic Sweep</h1>
+
   <button id="play-forward">Play Forward</button>
   <button id="play-backward">Play Backward</button>
 
@@ -28,6 +33,9 @@
   </div>
 
   <script>
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const noteBuffers = {};
+
     const noteFiles = {
       "C4": "Assets/C4.wav", "C4-sharp": "Assets/C4-sharp.wav", "D4": "Assets/D4.wav",
       "D4-sharp": "Assets/D4-sharp.wav", "E4": "Assets/E4.wav", "F4": "Assets/F4.wav",
@@ -46,31 +54,47 @@
       "F5", "F5-sharp", "G5", "G5-sharp", "A5", "A5-sharp", "B5"
     ];
 
-    function playNoteQuick(note) {
-      const audio = new Audio(noteFiles[note]);
-      audio.volume = 0.7;
-      audio.play();
-    }
-
-    async function playNotesFast(notes) {
-      const tempo = parseInt(document.getElementById("tempo").value);
-      for (let note of notes) {
-        playNoteQuick(note);
-        await new Promise(r => setTimeout(r, tempo));
+    async function loadBuffers() {
+      for (const note in noteFiles) {
+        const response = await fetch(noteFiles[note]);
+        const arrayBuffer = await response.arrayBuffer();
+        noteBuffers[note] = await audioContext.decodeAudioData(arrayBuffer);
       }
     }
 
+    function playNoteAtTime(note, time) {
+      const buffer = noteBuffers[note];
+      if (buffer) {
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(audioContext.destination);
+        source.start(time);
+      }
+    }
+
+    function playSweep(notes) {
+      const tempo = parseInt(document.getElementById("tempo").value);
+      const interval = tempo / 1000; // convert to seconds
+      const startTime = audioContext.currentTime + 0.05; // slight offset to avoid glitches
+
+      notes.forEach((note, i) => {
+        playNoteAtTime(note, startTime + i * interval);
+      });
+    }
+
     document.getElementById("play-forward").addEventListener("click", () => {
-      playNotesFast(chromaticNotes);
+      playSweep(chromaticNotes);
     });
 
     document.getElementById("play-backward").addEventListener("click", () => {
-      playNotesFast([...chromaticNotes].reverse());
+      playSweep([...chromaticNotes].reverse());
     });
 
     document.getElementById("tempo").addEventListener("input", (e) => {
       document.getElementById("tempo-value").textContent = e.target.value;
     });
+
+    window.addEventListener("load", loadBuffers);
   </script>
 </body>
 </html>
