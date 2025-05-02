@@ -1,237 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Ear Training Game</title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=0.8, maximum-scale=0.8, user-scalable=no">
-
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
-            font-family: sans-serif;
-        }
-
-        .keyboard-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
-
-        .keyboard {
-            display: flex;
-            border: 2px solid black;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .octave {
-            display: flex;
-            position: relative;
-        }
-
-        .white {
-            width: 60px;
-            height: 240px;
-            background-color: white;
-            border: 1px solid black;
-            display: inline-block;
-            position: relative;
-            z-index: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            padding-bottom: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .black {
-            width: 36px;
-            height: 160px;
-            background-color: black;
-            display: inline-block;
-            position: absolute;
-            z-index: 2;
-            left: 30px;
-            transform: translateX(-18px);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-        }
-
-        .c-sharp {left: 60px;}
-        .d-sharp {left: 122px;}
-        .f-sharp {left: 246px;}
-        .g-sharp {left: 307px;}
-        .a-sharp {left: 368px;}
-
-        .octave-label {
-            position: absolute;
-            top: -22px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .c4-label {color: blue;}
-        .c5-label {color: red;}
-
-        #top-bar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        #top-bar button {
-            flex-shrink: 0;
-        }
-
-        #info-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-            font-size: 16px;
-        }
-
-        #feedback {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .highlighted {
-            background-color: lightblue;
-        }
-
-        .wrong-highlight {
-            background-color: lightcoral;
-        }
-
-        #orientation-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            font-size: 20px;
-            text-align: center;
-        }
-
-        #orientation-overlay p {
-            margin: 20px;
-        }
-        /* Bigger overlay text */
-#orientation-overlay {
-    font-size: 28px;
-}
-
-#orientation-overlay p {
-    font-size: 32px;
-}
-
-/* Rounder and larger buttons */
-#game-controls button,
-button {
-    border-radius: 12px;     /* Adjust roundness here */
-    padding: 10px 18px;      /* Adjust button size here */
-    font-size: 16px;         /* Optional: slightly larger text */
-    cursor: pointer;         /* Optional: shows pointer on hover */
-    transition: background-color 0.3s ease;
-}
-        #score,
-#high-score,
-#time-remaining {
-    font-size: 22px; /* or any size you like */
-    font-weight: bold;
-}
-
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play All Notes</title>
 </head>
 <body>
+    <h1>Test: Play All Notes</h1>
 
-    <div id="orientation-overlay" style="display: none;">
-        <p>Please rotate your device to landscape mode for the best experience.</p>
-        <svg viewBox="0 0 64 32" width="64" height="32" fill="white">
-            <rect x="5" y="8" width="54" height="16" rx="2" ry="2" />
-            <rect x="2" y="6" width="6" height="20" rx="1" ry="1" />
-            <rect x="56" y="6" width="6" height="20" rx="1" ry="1" />
-        </svg>
-    </div>
-
-    <div class="keyboard-container">
-        <div class="keyboard">
-            <div class="octave">
-                <div class="octave-label c4-label">C4</div>
-                <div class="white" data-note="C4">C</div>
-                <div class="black c-sharp" data-note="C#4">C#<br>D♭</div>
-                <div class="white" data-note="D4">D</div>
-                <div class="black d-sharp" data-note="D#4">D#<br>E♭</div>
-                <div class="white" data-note="E4">E</div>
-                <div class="white" data-note="F4">F</div>
-                <div class="black f-sharp" data-note="F#4">F#<br>G♭</div>
-                <div class="white" data-note="G4">G</div>
-                <div class="black g-sharp" data-note="G#4">G#<br>A♭</div>
-                <div class="white" data-note="A4">A</div>
-                <div class="black a-sharp" data-note="A#4">A#<br>B♭</div>
-                <div class="white" data-note="B4">B</div>
-            </div>
-            <div class="octave">
-                <div class="octave-label c5-label">C5</div>
-                <div class="white" data-note="C5">C</div>
-                <div class="black c-sharp" data-note="C#5">C#<br>D♭</div>
-                <div class="white" data-note="D5">D</div>
-                <div class="black d-sharp" data-note="D#5">D#<br>E♭</div>
-                <div class="white" data-note="E5">E</div>
-                <div class="white" data-note="F5">F</div>
-                <div class="black f-sharp" data-note="F#5">F#<br>G♭</div>
-                <div class="white" data-note="G5">G</div>
-                <div class="black g-sharp" data-note="G#5">G#<br>A♭</div>
-                <div class="white" data-note="A5">A</div>
-                <div class="black a-sharp" data-note="A#5">A#<br>B♭</div>
-                <div class="white" data-note="B5">B</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="top-bar">
-        <button id="start-game-button">Start Game</button>
-        <button id="recap-button">Recap Note</button>
-        <button id="play-again-button" style="display: none;">Play Again</button>
-        <button id="play-all-notes-button">Play All Notes</button>
-        <div id="info-group">
-            <span id="score">Score: 0</span>
-            <span id="high-score">High Score: 0</span>
-            <span id="time-remaining">Time: 90</span>
-        </div>
-    </div>
-
-    <p id="feedback"></p>
+    <button id="play-all-notes">Play All Notes</button>
 
     <script>
         const noteFiles = {
@@ -261,135 +38,30 @@ button {
             "B5": "Assets/B5.wav"
         };
 
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let score = 0;
-        let highScore = 0;
-        let timeLeft = 90;
-        let timer;
-        let targetFrequency;
-        let inputEnabled = true;
-        const keyElements = document.querySelectorAll(".keyboard .white, .keyboard .black");
-        const feedbackEl = document.getElementById("feedback");
-
+        // Function to play a single note
         function playNote(note) {
             const audio = new Audio(noteFiles[note]);
             audio.play();
         }
 
-        function handleUserInput(frequency) {
-            if (!inputEnabled) return;
-
-            const clickedKey = Array.from(keyElements).find(key => key.dataset.note === frequency);
-
-            if (targetFrequency === frequency) {
-                score++;
-                playAwardSound();
-                updateScore();
-                highlightCorrectKey();
-                if (timeLeft > 0) {
-                    inputEnabled = false;
-                    setTimeout(() => {
-                        playTargetNote();
-                        inputEnabled = true;
-                    }, 600);
-                }
-            } else {
-                playDudSound();
-                updateScore();
-                if (clickedKey) {
-                    clickedKey.classList.add('wrong-highlight');
-                    setTimeout(() => {
-                        clickedKey.classList.remove('wrong-highlight');
-                    }, 500);
-                }
-            }
-        }
-
-        function playTargetNote() {
-            const allNotes = Object.keys(noteFiles);
-            const randomNote = allNotes[Math.floor(Math.random() * allNotes.length)];
-            targetFrequency = randomNote;
-            playNote(randomNote);
-        }
-
-        function playAwardSound() {
-            const awardSound = new Audio("Assets/award-sound.wav");
-            awardSound.play();
-        }
-
-        function playDudSound() {
-            const dudSound = new Audio("Assets/dud-sound.wav");
-            dudSound.play();
-        }
-
-        function updateScore() {
-            document.getElementById("score").textContent = "Score: " + score;
-        }
-
-        function highlightCorrectKey() {
-            const correctKey = Array.from(keyElements).find(key => key.dataset.note === targetFrequency);
-            if (correctKey) {
-                correctKey.classList.add('highlighted');
-                setTimeout(() => {
-                    correctKey.classList.remove('highlighted');
-                }, 500);
-            }
-        }
-
-        function startTimer() {
-            timer = setInterval(function() {
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    endGame();
-                } else {
-                    timeLeft--;
-                    document.getElementById("time-remaining").textContent = "Time: " + timeLeft;
-                }
-            }, 1000);
-        }
-
-        function endGame() {
-            if (score > highScore) {
-                highScore = score;
-            }
-            document.getElementById("high-score").textContent = "High Score: " + highScore;
-            feedbackEl.textContent = "Game Over! Final Score: " + score;
-        }
-
-        keyElements.forEach(key => {
-            key.addEventListener("click", () => {
-                const frequency = key.dataset.note;
-                handleUserInput(frequency);
-            });
-        });
-
-        document.getElementById("start-game-button").addEventListener("click", () => {
-            score = 0;
-            timeLeft = 90;
-            updateScore();
-            document.getElementById("time-remaining").textContent = "Time: " + timeLeft;
-            startTimer();
-            playTargetNote();
-        });
-
-        document.getElementById("play-all-notes-button").addEventListener("click", () => {
+        // Function to play all notes in a smooth sweep
+        function playAllNotes() {
             const allNotes = Object.keys(noteFiles);
             let i = 0;
+
             const playNext = () => {
                 if (i < allNotes.length) {
                     playNote(allNotes[i]);
                     i++;
-                    setTimeout(playNext, 500); // Play next note after half a second
+                    setTimeout(playNext, 500); // Play next note after 500ms
                 }
             };
-            playNext();
-        });
 
-        document.getElementById("recap-button").addEventListener("click", () => {
-            if (targetFrequency) {
-                playNote(targetFrequency);
-            }
-        });
+            playNext(); // Start the note sequence
+        }
+
+        // Button event listener to start playing all notes
+        document.getElementById("play-all-notes").addEventListener("click", playAllNotes);
     </script>
 </body>
 </html>
