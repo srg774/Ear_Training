@@ -237,6 +237,7 @@
                     console.error(`Error loading audio file for ${note}:`, error);
                 }
             }
+            console.log("Note Buffers Loaded:", noteBuffers); // Debugging: Check if buffers loaded
         }
 
         function isMobileOrTablet() {
@@ -265,16 +266,17 @@
         window.addEventListener('orientationchange', checkOrientation);
         document.addEventListener('DOMContentLoaded', () => {
             checkOrientation();
-            loadBuffers();
+            loadBuffers(); // Initiate loading audio buffers
         });
 
         function playNote(note) {
-            const buffer = noteBuffers[note];
-            if (buffer) {
+            if (noteBuffers[note]) {
                 const source = audioCtx.createBufferSource();
-                source.buffer = buffer;
+                source.buffer = noteBuffers[note];
                 source.connect(audioCtx.destination);
                 source.start();
+            } else {
+                console.warn(`No buffer loaded for note: ${note}`); // Debugging: Check if buffer exists
             }
         }
 
@@ -366,10 +368,4 @@
             document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
         }
 
-        function startGame() {
-            score = 0;
-            timeLeft = 90;
-            updateScore();
-            updateTimer();
-            playTargetNote();
-            document.getElementById('play-again-button').style.display = 'none';
+        function startGame
