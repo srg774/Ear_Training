@@ -1,72 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Play Chromatic Notes</title>
-  <style>
-    button {
-      margin-right: 5px;
-      margin-bottom: 5px;
-      padding: 8px 12px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Chromatic Sweep</title>
+    <style>
+        body { font-family: sans-serif; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
 </head>
 <body>
-  <h1>Play Individual Chromatic Notes</h1>
-  <div id="note-buttons">
-      </div>
+    <h1>Chromatic Sweep</h1>
+    <button id="play-sweep">Play Chromatic Sweep</button>
 
-  <script>
-    const noteFiles = {
-      "C4": "Assets/C4.wav",
-      "C4-sharp": "Assets/C4-sharp.wav",
-      "D4": "Assets/D4.wav",
-      "D4-sharp": "Assets/D4-sharp.wav",
-      "E4": "Assets/E4.wav",
-      "F4": "Assets/F4.wav",
-      "F4-sharp": "Assets/F4-sharp.wav",
-      "G4": "Assets/G4.wav",
-      "G4-sharp": "Assets/G4-sharp.wav",
-      "A4": "Assets/A4.wav",
-      "A4-sharp": "Assets/A4-sharp.wav",
-      "B4": "Assets/B4.wav",
-      "C5": "Assets/C5.wav",
-      "C5-sharp": "Assets/C5-sharp.wav",
-      "D5": "Assets/D5.wav",
-      "D5-sharp": "Assets/D5-sharp.wav",
-      "E5": "Assets/E5.wav",
-      "F5": "Assets/F5.wav",
-      "F5-sharp": "Assets/F5-sharp.wav",
-      "G5": "Assets/G5.wav",
-      "G5-sharp": "Assets/G5-sharp.wav",
-      "A5": "Assets/A5.wav",
-      "A5-sharp": "Assets/A5-sharp.wav",
-      "B5": "Assets/B5.wav"
-    };
+    <script>
+        const noteFiles = {
+            "C4": "Assets/C4.wav",
+            "C#4": "Assets/C#4.wav",
+            "D4": "Assets/D4.wav",
+            "D#4": "Assets/D#4.wav",
+            "E4": "Assets/E4.wav",
+            "F4": "Assets/F4.wav",
+            "F#4": "Assets/F#4.wav",
+            "G4": "Assets/G4.wav",
+            "G#4": "Assets/G#4.wav",
+            "A4": "Assets/A4.wav",
+            "A#4": "Assets/A#4.wav",
+            "B4": "Assets/B4.wav",
+            "C5": "Assets/C5.wav",
+            "C#5": "Assets/C#5.wav",
+            "D5": "Assets/D5.wav",
+            "D#5": "Assets/D#5.wav",
+            "E5": "Assets/E5.wav",
+            "F5": "Assets/F5.wav",
+            "F#5": "Assets/F#5.wav",
+            "G5": "Assets/G5.wav",
+            "G#5": "Assets/G#5.wav",
+            "A5": "Assets/A5.wav",
+            "A#5": "Assets/A#5.wav",
+            "B5": "Assets/B5.wav"
+        };
 
-    const chromaticNotes = [
-      "C4", "C4-sharp", "D4", "D4-sharp", "E4",
-      "F4", "F4-sharp", "G4", "G4-sharp", "A4", "A4-sharp", "B4",
-      "C5", "C5-sharp", "D5", "D5-sharp", "E5",
-      "F5", "F5-sharp", "G5", "G5-sharp", "A5", "A5-sharp", "B5"
-    ];
+        const audioCache = {};
 
-    const noteButtonsDiv = document.getElementById("note-buttons");
+        function preloadNotes() {
+            for (const note in noteFiles) {
+                audioCache[note] = new Audio(noteFiles[note]);
+            }
+        }
 
-    function playNote(note) {
-      const audio = new Audio(noteFiles[note]);
-      audio.volume = 0.7;
-      audio.play();
-    }
+        function playNote(note) {
+            return new Promise(resolve => {
+                if (audioCache[note]) {
+                    const audio = audioCache[note].cloneNode();
+                    audio.onended = resolve;
+                    audio.play();
+                } else {
+                    console.error(`Audio file for ${note} not preloaded.`);
+                    resolve();
+                }
+            });
+        }
 
-    chromaticNotes.forEach(note => {
-      const button = document.createElement("button");
-      button.textContent = note;
-      button.addEventListener("click", () => playNote(note));
-      noteButtonsDiv.appendChild(button);
-    });
-  </script>
+        async function playChromaticSweep(delayMs = 100) { // Delay in milliseconds between notes
+            const allNotes = Object.keys(noteFiles);
+            for (let i = 0; i < allNotes.length; i++) {
+                await playNote(allNotes[i]);
+                if (i < allNotes.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, delayMs));
+                }
+            }
+        }
+
+        window.onload = preloadNotes;
+
+        document.getElementById("play-sweep").addEventListener("click", () => playChromaticSweep(80)); // Adjust the delay here for the speed of the sweep
+    </script>
 </body>
 </html>
