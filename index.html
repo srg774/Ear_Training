@@ -240,7 +240,7 @@ button {
         let timeLeft = 90;
         let timer;
         let targetFrequency;
-        let inputEnabled = true;
+        let inputEnabled = false; // Initially disabled until audio loads
         const orientationOverlay = document.getElementById('orientation-overlay');
         const keyboardContainer = document.querySelector('.keyboard-container');
         const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
@@ -248,35 +248,58 @@ button {
         const noteBuffers = {};
         let rewardSoundBuffer;
         let mistakeSoundBuffer;
+        let audioLoaded = false; // Flag to track if audio is loaded
 
         async function loadAudio(url) {
-            const response = await fetch(url);
-            const arrayBuffer = await response.arrayBuffer();
-            return await audioCtx.decodeAudioData(arrayBuffer);
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const arrayBuffer = await response.arrayBuffer();
+                return await audioCtx.decodeAudioData(arrayBuffer);
+            } catch (error) {
+                console.error('Error loading audio:', url, error);
+                return null;
+            }
         }
 
         async function loadNoteBuffers() {
-            for (const freq of allFrequencies) {
-                try {
-                    noteBuffers[freq] = await loadAudio(`Assets/${freq}.wav`);
-                } catch (error) {
-                    console.error(`Error loading audio for ${freq}:`, error);
+            const loadPromises = allFrequencies.map(async (freq) => {
+                noteBuffers[freq] = await loadAudio(`Assets/${freq}.wav`);
+            });
+
+            const rewardPromise = loadAudio('Assets/reward.wav');
+            const mistakePromise = loadAudio('Assets/mistake.wav');
+
+            const results = await Promise.all([...loadPromises, rewardPromise, mistakePromise]);
+
+            allFrequencies.forEach((freq, index) => {
+                if (!results[index]) {
+                    console.error(`Failed to load audio for frequency: ${freq}`);
+                    return;
                 }
-            }
-            try {
-                rewardSoundBuffer = await loadAudio('Assets/reward.wav'); // Assuming 'reward.wav' in your assets
-                mistakeSoundBuffer = await loadAudio('Assets/mistake.wav'); // Assuming 'mistake.wav' in your assets
-            } catch (error) {
-                console.error('Error loading reward or mistake sounds:', error);
+            });
+            rewardSoundBuffer = results[allFrequencies.length];
+            mistakeSoundBuffer = results[allFrequencies.length + 1];
+
+            if (rewardSoundBuffer && mistakeSoundBuffer && Object.keys(noteBuffers).length === allFrequencies.length) {
+                audioLoaded = true;
+                inputEnabled = true; // Enable input once all audio is loaded
+                console.log('All audio loaded successfully.');
+            } else {
+                console.error('Not all audio files loaded correctly.');
             }
         }
 
         function playSound(buffer) {
-            if (buffer) {
+            if (buffer && audioCtx.state === 'running') {
                 const source = audioCtx.createBufferSource();
                 source.buffer = buffer;
                 source.connect(audioCtx.destination);
                 source.start();
+            } else if (buffer && audioCtx.state !== 'running') {
+                console.warn('Audio context is not running.');
             }
         }
 
@@ -326,8 +349,12 @@ button {
         }
 
         function playTargetNote() {
-            targetFrequency = generateRandomFrequency();
-            playNote(targetFrequency);
+            if (audioLoaded) {
+                targetFrequency = generateRandomFrequency();
+                playNote(targetFrequency);
+            } else {
+                console.warn('Audio not loaded yet, cannot play target note.');
+            }
         }
 
         function handleUserInput(frequency) {
@@ -361,7 +388,15 @@ button {
 
         keyElements.forEach(key => {
             key.addEventListener('click', () => {
-                handleUserInput(parseFloat(key.dataset.freq));
+                // Resume audio context on first interaction
+                if (audioCtx.state !== 'running') {
+                    audioCtx.resume().then(() => {
+                        console.log('Audio context resumed.');
+                        handleUserInput(parseFloat(key.dataset.freq));
+                    });
+                } else {
+                    handleUserInput(parseFloat(key.dataset.freq));
+                }
             });
         });
 
@@ -380,56 +415,17 @@ button {
         }
 
         function startGame() {
-            score = 0;
-            timeLeft = 90;
-            updateScore();
-            updateTimer();
-            playTargetNote();
-            document.getElementById('play-again-button').style.display = 'none';
-            document.getElementById('feedback').textContent = "";
-            inputEnabled = true;
-            keyElements.forEach(key => key.style.pointerEvents = 'auto');
-            clearInterval(timer); // Clear any existing timer
-            timer = setInterval(() => {
-                timeLeft--;
+            if (audioLoaded) {
+                score = 0;
+                timeLeft = 90;
+                updateScore();
                 updateTimer();
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    document.getElementById('feedback').textContent = "";
-                    document.getElementById('play-again-button').style.display = 'block';
-                    inputEnabled = false;
-                    keyElements.forEach(key => key.style.pointerEvents = 'none');
-                }
-            }, 1000);
-        }
-
-        document.getElementById('start-game-button').addEventListener('click', startGame);
-        document.getElementById('recap-button').addEventListener('click', () => {
-            if (targetFrequency) {
-                playNote(targetFrequency);
-            }
-        });
-        document.getElementById('play-again-button').addEventListener('click', startGame);
-        document.getElementById('play-all-notes-button').addEventListener('click', () => {
-            let delay = 0;
-            allFrequencies.forEach((freq) => {
-                setTimeout(() => {
-                    playNote(freq);
-                    highlightKey(freq);
-                }, delay);
-                delay += 600;
-            });
-        });
-
-        function highlightKey(frequency) {
-            keyElements.forEach(key => {
-                if (parseFloat(key.dataset.freq) === frequency) {
-                    key.classList.add('highlighted');
-                    setTimeout(() => {
-                        key.classList.remove('highlighted');
-                    }, 500);
-                }
-            });
-        }
-
-        function highlightCorrectKey() {
+                playTargetNote();
+                document.getElementById('play-again-button').style.display = 'none';
+                document.getElementById('feedback').textContent = "";
+                inputEnabled = true;
+                keyElements.forEach(key => key.style.pointerEvents = 'auto');
+                clearInterval(timer); // Clear any existing timer
+                timer = setInterval(() => {
+                    timeLeft--;
+                    updateTimer();
