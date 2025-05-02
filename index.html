@@ -1,70 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Play Chromatic Notes</title>
+  <meta charset="UTF-8">
+  <title>Play Chromatic Notes</title>
+  <style>
+    button {
+      margin-right: 5px;
+      margin-bottom: 5px;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <h1>Play All Notes Chromatically</h1>
-  <button id="play-all-notes">Play All Notes</button>
+  <h1>Play Individual Chromatic Notes</h1>
+  <div id="note-buttons">
+      </div>
 
-  <script>
-    const noteFiles = {
-      "C4": "Assets/C4.wav",
-      "C4-sharp": "Assets/C4-sharp.wav",
-      "D4": "Assets/D4.wav",
-      "D4-sharp": "Assets/D4-sharp.wav",
-      "E4": "Assets/E4.wav",
-      "F4": "Assets/F4.wav",
-      "F4-sharp": "Assets/F4-sharp.wav",
-      "G4": "Assets/G4.wav",
-      "G4-sharp": "Assets/G4-sharp.wav",
-      "A4": "Assets/A4.wav",
-      "A4-sharp": "Assets/A4-sharp.wav",
-      "B4": "Assets/B4.wav",
-      "C5": "Assets/C5.wav",
-      "C5-sharp": "Assets/C5-sharp.wav",
-      "D5": "Assets/D5.wav",
-      "D5-sharp": "Assets/D5-sharp.wav",
-      "E5": "Assets/E5.wav",
-      "F5": "Assets/F5.wav",
-      "F5-sharp": "Assets/F5-sharp.wav",
-      "G5": "Assets/G5.wav",
-      "G5-sharp": "Assets/G5-sharp.wav",
-      "A5": "Assets/A5.wav",
-      "A5-sharp": "Assets/A5-sharp.wav",
-      "B5": "Assets/B5.wav"
-    };
+  <script>
+    const noteFiles = {
+      "C4": "Assets/C4.wav",
+      "C4-sharp": "Assets/C4-sharp.wav",
+      "D4": "Assets/D4.wav",
+      "D4-sharp": "Assets/D4-sharp.wav",
+      "E4": "Assets/E4.wav",
+      "F4": "Assets/F4.wav",
+      "F4-sharp": "Assets/F4-sharp.wav",
+      "G4": "Assets/G4.wav",
+      "G4-sharp": "Assets/G4-sharp.wav",
+      "A4": "Assets/A4.wav",
+      "A4-sharp": "Assets/A4-sharp.wav",
+      "B4": "Assets/B4.wav",
+      "C5": "Assets/C5.wav",
+      "C5-sharp": "Assets/C5-sharp.wav",
+      "D5": "Assets/D5.wav",
+      "D5-sharp": "Assets/D5-sharp.wav",
+      "E5": "Assets/E5.wav",
+      "F5": "Assets/F5.wav",
+      "F5-sharp": "Assets/F5-sharp.wav",
+      "G5": "Assets/G5.wav",
+      "G5-sharp": "Assets/G5-sharp.wav",
+      "A5": "Assets/A5.wav",
+      "A5-sharp": "Assets/A5-sharp.wav",
+      "B5": "Assets/B5.wav"
+    };
 
-    const chromaticNotes = [
-      "C4", "C4-sharp", "D4", "D4-sharp", "E4",
-      "F4", "F4-sharp", "G4", "G4-sharp", "A4", "A4-sharp", "B4",
-      "C5", "C5-sharp", "D5", "D5-sharp", "E5",
-      "F5", "F5-sharp", "G5", "G5-sharp", "A5", "A5-sharp", "B5"
-    ];
+    const chromaticNotes = [
+      "C4", "C4-sharp", "D4", "D4-sharp", "E4",
+      "F4", "F4-sharp", "G4", "G4-sharp", "A4", "A4-sharp", "B4",
+      "C5", "C5-sharp", "D5", "D5-sharp", "E5",
+      "F5", "F5-sharp", "G5", "G5-sharp", "A5", "A5-sharp", "B5"
+    ];
 
-    function playNote(note) {
-      return new Promise((resolve, reject) => {
-        const audio = new Audio(noteFiles[note]);
-        audio.volume = 0.7;
-        audio.play();
-        audio.onended = resolve;
-        audio.onerror = () => reject(`Error playing ${note}`);
-      });
-    }
+    const noteButtonsDiv = document.getElementById("note-buttons");
 
-    async function playAllNotes() {
-      for (let note of chromaticNotes) {
-        try {
-          await playNote(note);
-          await new Promise(r => setTimeout(r, 50)); // shorter delay
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    }
+    function playNote(note) {
+      const audio = new Audio(noteFiles[note]);
+      audio.volume = 0.7;
+      audio.play();
+    }
 
-    document.getElementById("play-all-notes").addEventListener("click", playAllNotes);
-  </script>
+    chromaticNotes.forEach(note => {
+      const button = document.createElement("button");
+      button.textContent = note;
+      button.addEventListener("click", () => playNote(note));
+      noteButtonsDiv.appendChild(button);
+    });
+  </script>
 </body>
 </html>
