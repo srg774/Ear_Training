@@ -110,7 +110,7 @@
 
       osc.type = "triangle";
       osc.frequency.setValueAtTime(261.63, now); // C4
-      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.setValueAtTime(0.67, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
 
       osc.connect(gain).connect(audioContext.destination);
