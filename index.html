@@ -176,7 +176,7 @@ button {
 <body>
 
     <div id="orientation-overlay" style="display: none;">
-<p>Please rotate your device to landscape mode for the best experience. Enjoy - <br>enjoy<br><i>SRG774</i></p>
+        <p>Please rotate your device to landscape mode for the best experience.</p>
         <svg viewBox="0 0 64 32" width="64" height="32" fill="white">
             <rect x="5" y="8" width="54" height="16" rx="2" ry="2" />
             <rect x="2" y="6" width="6" height="20" rx="1" ry="1" />
@@ -276,24 +276,19 @@ button {
           }
         }
 
-   function playCorrectSound() {
-    const now = audioContext.currentTime;
-    const freqs = [440]; // A4
-
-    freqs.forEach((freq, i) => {
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(0.9, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-
-        osc.connect(gain).connect(audioContext.destination);
-        osc.start(now + i * 0.03);
-        osc.stop(now + 0.4);
-    });
-}
+        function playCorrectSound() {
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, now);
+            gain.gain.setValueAtTime(0.95, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.4);
+        }
 
         function playMistakeSound() {
             const now = audioCtx.currentTime;
