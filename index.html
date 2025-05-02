@@ -226,6 +226,7 @@
             "F5-sharp": "Assets/F5-sharp.wav", "G5": "Assets/G5.wav", "G5-sharp": "Assets/G5-sharp.wav",
             "A5": "Assets/A5.wav", "A5-sharp": "Assets/A5-sharp.wav", "B5": "Assets/B5.wav"
         };
+
         async function loadBuffers() {
             for (const note in noteFiles) {
                 try {
@@ -237,9 +238,11 @@
                 }
             }
         }
+
         function isMobileOrTablet() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         }
+
         function checkOrientation() {
             if (isMobileOrTablet()) {
                 if (window.innerWidth < window.innerHeight) {
@@ -257,12 +260,14 @@
                 document.getElementById('top-bar').style.display = 'flex';
             }
         }
+
         window.addEventListener('resize', checkOrientation);
         window.addEventListener('orientationchange', checkOrientation);
         document.addEventListener('DOMContentLoaded', () => {
             checkOrientation();
             loadBuffers();
         });
+
         function playNote(note) {
             const buffer = noteBuffers[note];
             if (buffer) {
@@ -272,6 +277,7 @@
                 source.start();
             }
         }
+
         function playAwardSound() {
             const now = audioCtx.currentTime;
             const osc1 = audioCtx.createOscillator();
@@ -291,6 +297,7 @@
             osc1.stop(now + 0.8);
             osc2.stop(now + 0.85);
         }
+
         function playDudSound() {
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
@@ -304,13 +311,16 @@
             osc.start(now);
             osc.stop(now + 0.7);
         }
+
         function generateRandomNote() {
             return allNotes[Math.floor(Math.random() * allNotes.length)];
         }
+
         function playTargetNote() {
             targetNote = generateRandomNote();
             playNote(targetNote);
         }
+
         function handleUserInput(note) {
             if (!inputEnabled) return;
             const clickedKey = Array.from(keyElements).find(key => key.dataset.note === note);
@@ -337,11 +347,13 @@
                 }
             }
         }
+
         keyElements.forEach(key => {
             key.addEventListener('click', () => {
                 handleUserInput(key.dataset.note);
             });
         });
+
         function updateScore() {
             document.getElementById('score').textContent = `Score: ${score}`;
             if (score > highScore) {
@@ -349,15 +361,15 @@
                 document.getElementById('high-score').textContent = `High Score: ${highScore}`;
             }
         }
+
         function updateTimer() {
-            if (timeLeft >= 0) {
-                document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
-            }
+            document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
         }
+
         function startGame() {
             score = 0;
             timeLeft = 90;
             updateScore();
             updateTimer();
             playTargetNote();
-            document.getElementById('play-again-
+            document.getElementById('play-again-button').style.display = 'none';
