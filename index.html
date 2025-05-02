@@ -1,140 +1,357 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Chromatic Sweep</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-    }
-    button {
-      margin: 5px;
-      padding: 10px 15px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    #tempo-container {
-      margin-top: 20px;
-      font-size: 16px;
-    }
-  </style>
+    <title>Ear Training Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=0.8, maximum-scale=0.8, user-scalable=no">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+            font-family: sans-serif;
+        }
+        .keyboard-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .keyboard {
+            display: flex;
+            border: 2px solid black;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .octave {
+            display: flex;
+            position: relative;
+        }
+        .white {
+            width: 60px;
+            height: 240px;
+            background-color: white;
+            border: 1px solid black;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .black {
+            width: 36px;
+            height: 160px;
+            background-color: black;
+            display: inline-block;
+            position: absolute;
+            z-index: 2;
+            left: 30px;
+            transform: translateX(-18px);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .c-sharp {left: 60px;}
+        .d-sharp {left: 122px;}
+        .f-sharp {left: 246px;}
+        .g-sharp {left: 307px;}
+        .a-sharp {left: 368px;}
+        .octave-label {
+            position: absolute;
+            top: -22px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .c4-label {color: blue;}
+        .c5-label {color: red;}
+        #top-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        #top-bar button {
+            flex-shrink: 0;
+        }
+        #info-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            font-size: 16px;
+        }
+        #feedback {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .highlighted {
+            background-color: lightblue;
+        }
+        .wrong-highlight {
+            background-color: lightcoral;
+        }
+        #orientation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            font-size: 28px;
+            text-align: center;
+        }
+        #orientation-overlay p {
+            margin: 20px;
+            font-size: 32px;
+        }
+        #game-controls button,
+        button {
+            border-radius: 12px;
+            padding: 10px 18px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #score,
+        #high-score,
+        #time-remaining {
+            font-size: 22px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-  <h1>Chromatic Sweep</h1>
-
-  <button id="play-forward">Play Forward</button>
-  <button id="play-backward">Play Backward</button>
-  <button id="reward-sound">✅ Reward Sound</button>
-  <button id="mistake-sound">❌ Mistake Sound</button>
-
-  <div id="tempo-container">
-    <label for="tempo">Tempo (ms between notes): </label>
-    <input type="range" id="tempo" min="30" max="300" value="100" step="10">
-    <span id="tempo-value">100</span> ms
-  </div>
-
-  <script>
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const noteBuffers = {};
-
-    const noteFiles = {
-      "C4": "Assets/C4.wav", "C4-sharp": "Assets/C4-sharp.wav", "D4": "Assets/D4.wav",
-      "D4-sharp": "Assets/D4-sharp.wav", "E4": "Assets/E4.wav", "F4": "Assets/F4.wav",
-      "F4-sharp": "Assets/F4-sharp.wav", "G4": "Assets/G4.wav", "G4-sharp": "Assets/G4-sharp.wav",
-      "A4": "Assets/A4.wav", "A4-sharp": "Assets/A4-sharp.wav", "B4": "Assets/B4.wav",
-      "C5": "Assets/C5.wav", "C5-sharp": "Assets/C5-sharp.wav", "D5": "Assets/D5.wav",
-      "D5-sharp": "Assets/D5-sharp.wav", "E5": "Assets/E5.wav", "F5": "Assets/F5.wav",
-      "F5-sharp": "Assets/F5-sharp.wav", "G5": "Assets/G5.wav", "G5-sharp": "Assets/G5-sharp.wav",
-      "A5": "Assets/A5.wav", "A5-sharp": "Assets/A5-sharp.wav", "B5": "Assets/B5.wav"
-    };
-
-    const chromaticNotes = [
-      "C4", "C4-sharp", "D4", "D4-sharp", "E4",
-      "F4", "F4-sharp", "G4", "G4-sharp", "A4", "A4-sharp", "B4",
-      "C5", "C5-sharp", "D5", "D5-sharp", "E5",
-      "F5", "F5-sharp", "G5", "G5-sharp", "A5", "A5-sharp", "B5"
-    ];
-
-    async function loadBuffers() {
-      for (const note in noteFiles) {
-        const response = await fetch(noteFiles[note]);
-        const arrayBuffer = await response.arrayBuffer();
-        noteBuffers[note] = await audioContext.decodeAudioData(arrayBuffer);
-      }
-    }
-
-    function playNoteAtTime(note, time) {
-      const buffer = noteBuffers[note];
-      if (buffer) {
-        const source = audioContext.createBufferSource();
-        source.buffer = buffer;
-        source.connect(audioContext.destination);
-        source.start(time);
-      }
-    }
-
-    function playSweep(notes) {
-      const tempo = parseInt(document.getElementById("tempo").value);
-      const interval = tempo / 1000; // in seconds
-      const startTime = audioContext.currentTime + 0.05;
-
-      notes.forEach((note, i) => {
-        playNoteAtTime(note, startTime + i * interval);
-      });
-    }
-
-    function playRewardSound() {
-      const now = audioContext.currentTime;
-      const freqs = [523.25, 659.25, 783.99]; // C5, E5, G5
-
-      freqs.forEach((freq, i) => {
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(0.67, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-
-        osc.connect(gain).connect(audioContext.destination);
-        osc.start(now + i * 0.03);
-        osc.stop(now + 1);
-      });
-    }
-
-    function playMistakeSound() {
-      const now = audioContext.currentTime;
-      const osc = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(261.63, now); // C4
-      gain.gain.setValueAtTime(0.67, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-
-      osc.connect(gain).connect(audioContext.destination);
-      osc.start(now);
-      osc.stop(now + 0.7);
-    }
-
-    document.getElementById("play-forward").addEventListener("click", () => {
-      playSweep(chromaticNotes);
-    });
-
-    document.getElementById("play-backward").addEventListener("click", () => {
-      playSweep([...chromaticNotes].reverse());
-    });
-
-    document.getElementById("reward-sound").addEventListener("click", playRewardSound);
-    document.getElementById("mistake-sound").addEventListener("click", playMistakeSound);
-
-    document.getElementById("tempo").addEventListener("input", (e) => {
-      document.getElementById("tempo-value").textContent = e.target.value;
-    });
-
-    window.addEventListener("load", loadBuffers);
-  </script>
-</body>
-</html>
+    <div id="orientation-overlay" style="display: none;">
+        <p>Please rotate your device to landscape mode for the best experience.</p>
+        <svg viewBox="0 0 64 32" width="64" height="32" fill="white">
+            <rect x="5" y="8" width="54" height="16" rx="2" ry="2" />
+            <rect x="2" y="6" width="6" height="20" rx="1" ry="1" />
+            <rect x="56" y="6" width="6" height="20" rx="1" ry="1" />
+        </svg>
+    </div>
+    <div class="keyboard-container">
+        <div class="keyboard">
+            <div class="octave">
+                <div class="octave-label c4-label">C4</div>
+                <div class="white" data-note="C4">C</div>
+                <div class="black c-sharp" data-note="C4-sharp">C#<br>D♭</div>
+                <div class="white" data-note="D4">D</div>
+                <div class="black d-sharp" data-note="D4-sharp">D#<br>E♭</div>
+                <div class="white" data-note="E4">E</div>
+                <div class="white" data-note="F4">F</div>
+                <div class="black f-sharp" data-note="F4-sharp">F#<br>G♭</div>
+                <div class="white" data-note="G4">G</div>
+                <div class="black g-sharp" data-note="G4-sharp">G#<br>A♭</div>
+                <div class="white" data-note="A4">A</div>
+                <div class="black a-sharp" data-note="A4-sharp">A#<br>B♭</div>
+                <div class="white" data-note="B4">B</div>
+            </div>
+            <div class="octave">
+                <div class="octave-label c5-label">C5</div>
+                <div class="white" data-note="C5">C</div>
+                <div class="black c-sharp" data-note="C5-sharp">C#<br>D♭</div>
+                <div class="white" data-note="D5">D</div>
+                <div class="black d-sharp" data-note="D5-sharp">D#<br>E♭</div>
+                <div class="white" data-note="E5">E</div>
+                <div class="white" data-note="F5">F</div>
+                <div class="black f-sharp" data-note="F5-sharp">F#<br>G♭</div>
+                <div class="white" data-note="G5">G</div>
+                <div class="black g-sharp" data-note="G5-sharp">G#<br>A♭</div>
+                <div class="white" data-note="A5">A</div>
+                <div class="black a-sharp" data-note="A5-sharp">A#<br>B♭</div>
+                <div class="white" data-note="B5">B</div>
+            </div>
+        </div>
+    </div>
+    <div id="top-bar">
+        <button id="start-game-button">Start Game</button>
+        <button id="recap-button">Recap Note</button>
+        <button id="play-again-button" style="display: none;">Play Again</button>
+        <button id="play-all-notes-button">Play All Notes</button>
+        <div id="info-group">
+            <span id="score">Score: 0</span>
+            <span id="high-score">High Score: 0</span>
+            <span id="time-remaining">Time: 90</span>
+        </div>
+    </div>
+    <p id="feedback"></p>
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const noteBuffers = {};
+        let score = 0;
+        let highScore = 0;
+        let timeLeft = 90;
+        let timer;
+        let targetNote;
+        let inputEnabled = true;
+        const orientationOverlay = document.getElementById('orientation-overlay');
+        const keyboardContainer = document.querySelector('.keyboard-container');
+        const keyElements = document.querySelectorAll('.white, .black');
+        const allNotes = [
+            "C4", "C4-sharp", "D4", "D4-sharp", "E4", "F4", "F4-sharp", "G4", "G4-sharp", "A4", "A4-sharp", "B4",
+            "C5", "C5-sharp", "D5", "D5-sharp", "E5", "F5", "F5-sharp", "G5", "G5-sharp", "A5", "A5-sharp", "B5"
+        ];
+        const noteFiles = {
+            "C4": "Assets/C4.wav", "C4-sharp": "Assets/C4-sharp.wav", "D4": "Assets/D4.wav",
+            "D4-sharp": "Assets/D4-sharp.wav", "E4": "Assets/E4.wav", "F4": "Assets/F4.wav",
+            "F4-sharp": "Assets/F4-sharp.wav", "G4": "Assets/G4.wav", "G4-sharp": "Assets/G4-sharp.wav",
+            "A4": "Assets/A4.wav", "A4-sharp": "Assets/A4-sharp.wav", "B4": "Assets/B4.wav",
+            "C5": "Assets/C5.wav", "C5-sharp": "Assets/C5-sharp.wav", "D5": "Assets/D5.wav",
+            "D5-sharp": "Assets/D5-sharp.wav", "E5": "Assets/E5.wav", "F5": "Assets/F5.wav",
+            "F5-sharp": "Assets/F5-sharp.wav", "G5": "Assets/G5.wav", "G5-sharp": "Assets/G5-sharp.wav",
+            "A5": "Assets/A5.wav", "A5-sharp": "Assets/A5-sharp.wav", "B5": "Assets/B5.wav"
+        };
+        async function loadBuffers() {
+            for (const note in noteFiles) {
+                try {
+                    const response = await fetch(noteFiles[note]);
+                    const arrayBuffer = await response.arrayBuffer();
+                    noteBuffers[note] = await audioCtx.decodeAudioData(arrayBuffer);
+                } catch (error) {
+                    console.error(`Error loading audio file for ${note}:`, error);
+                }
+            }
+        }
+        function isMobileOrTablet() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+        function checkOrientation() {
+            if (isMobileOrTablet()) {
+                if (window.innerWidth < window.innerHeight) {
+                    orientationOverlay.style.display = 'flex';
+                    keyboardContainer.style.display = 'none';
+                    document.getElementById('top-bar').style.display = 'none';
+                } else {
+                    orientationOverlay.style.display = 'none';
+                    keyboardContainer.style.display = 'flex';
+                    document.getElementById('top-bar').style.display = 'flex';
+                }
+            } else {
+                orientationOverlay.style.display = 'none';
+                keyboardContainer.style.display = 'flex';
+                document.getElementById('top-bar').style.display = 'flex';
+            }
+        }
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', checkOrientation);
+        document.addEventListener('DOMContentLoaded', () => {
+            checkOrientation();
+            loadBuffers();
+        });
+        function playNote(note) {
+            const buffer = noteBuffers[note];
+            if (buffer) {
+                const source = audioCtx.createBufferSource();
+                source.buffer = buffer;
+                source.connect(audioCtx.destination);
+                source.start();
+            }
+        }
+        function playAwardSound() {
+            const now = audioCtx.currentTime;
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc1.type = 'sine';
+            osc2.type = 'sine';
+            osc1.frequency.setValueAtTime(440, now);
+            osc2.frequency.setValueAtTime(660, now);
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+            osc1.connect(gainNode);
+            osc2.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc1.start(now);
+            osc2.start(now + 0.05);
+            osc1.stop(now + 0.8);
+            osc2.stop(now + 0.85);
+        }
+        function playDudSound() {
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(220, now);
+            gainNode.gain.setValueAtTime(0.4, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.7);
+        }
+        function generateRandomNote() {
+            return allNotes[Math.floor(Math.random() * allNotes.length)];
+        }
+        function playTargetNote() {
+            targetNote = generateRandomNote();
+            playNote(targetNote);
+        }
+        function handleUserInput(note) {
+            if (!inputEnabled) return;
+            const clickedKey = Array.from(keyElements).find(key => key.dataset.note === note);
+            if (targetNote === note) {
+                score++;
+                playAwardSound();
+                updateScore();
+                highlightCorrectKey();
+                if (timeLeft > 0) {
+                    inputEnabled = false;
+                    setTimeout(() => {
+                        playTargetNote();
+                        inputEnabled = true;
+                    }, 1000);
+                }
+            } else {
+                playDudSound();
+                updateScore();
+                if (clickedKey) {
+                    clickedKey.classList.add('wrong-highlight');
+                    setTimeout(() => {
+                        clickedKey.classList.remove('wrong-highlight');
+                    }, 500);
+                }
+            }
+        }
+        keyElements.forEach(key => {
+            key.addEventListener('click', () => {
+                handleUserInput(key.dataset.note);
+            });
+        });
+        function updateScore() {
+            document.getElementById('score').textContent = `Score: ${score}`;
+            if (score > highScore) {
+                highScore = score;
+                document.getElementById('high-score').textContent = `High Score: ${highScore}`;
+            }
+        }
+        function updateTimer() {
+            if (timeLeft >= 0) {
+                document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
+            }
+        }
+        function startGame
