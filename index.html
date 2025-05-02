@@ -1,159 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Ear Training Game</title>
     <meta name="viewport" content="width=device-width, initial-scale=0.8, maximum-scale=0.8, user-scalable=no">
+
     <style>
         body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+            color: #333;
             margin: 0;
-            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
-            font-family: sans-serif;
+            padding: 0;
         }
         .keyboard-container {
             display: flex;
             justify-content: center;
-            align-items: center;
-            width: 100%;
+            margin-top: 20px;
         }
         .keyboard {
             display: flex;
-            border: 2px solid black;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         .octave {
             display: flex;
-            position: relative;
+            flex-direction: column;
+            align-items: center;
+        }
+        .white, .black {
+            height: 120px;
+            width: 30px;
+            margin: 1px;
+            cursor: pointer;
         }
         .white {
-            width: 60px;
-            height: 240px;
             background-color: white;
-            border: 1px solid black;
-            display: inline-block;
-            position: relative;
+            border: 1px solid #ccc;
             z-index: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            padding-bottom: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
         }
         .black {
-            width: 36px;
-            height: 160px;
             background-color: black;
-            display: inline-block;
-            position: absolute;
+            width: 20px;
+            margin-left: -10px;
             z-index: 2;
-            left: 30px;
-            transform: translateX(-18px);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
         }
-        .c-sharp {left: 60px;}
-        .d-sharp {left: 122px;}
-        .f-sharp {left: 246px;}
-        .g-sharp {left: 307px;}
-        .a-sharp {left: 368px;}
-        .octave-label {
-            position: absolute;
-            top: -22px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .c4-label {color: blue;}
-        .c5-label {color: red;}
         #top-bar {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 20px;
-            text-align: center;
-        }
-        #top-bar button {
-            flex-shrink: 0;
-        }
-        #info-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-            font-size: 16px;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #333;
+            color: white;
         }
         #feedback {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: bold;
             text-align: center;
-        }
-        .highlighted {
-            background-color: lightblue;
-        }
-        .wrong-highlight {
-            background-color: lightcoral;
-        }
-        #orientation-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            font-size: 28px;
-            text-align: center;
-        }
-        #orientation-overlay p {
-            margin: 20px;
-            font-size: 32px;
-        }
-        #game-controls button,
-        button {
-            border-radius: 12px;
-            padding: 10px 18px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        #score,
-        #high-score,
-        #time-remaining {
-            font-size: 22px;
-            font-weight: bold;
+            margin-top: 20px;
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
+
+    <!-- Game Interface -->
     <div id="orientation-overlay" style="display: none;">
         <p>Please rotate your device to landscape mode for the best experience.</p>
-        <svg viewBox="0 0 64 32" width="64" height="32" fill="white">
-            <rect x="5" y="8" width="54" height="16" rx="2" ry="2" />
-            <rect x="2" y="6" width="6" height="20" rx="1" ry="1" />
-            <rect x="56" y="6" width="6" height="20" rx="1" ry="1" />
-        </svg>
     </div>
+
     <div class="keyboard-container">
         <div class="keyboard">
             <div class="octave">
@@ -188,6 +98,7 @@
             </div>
         </div>
     </div>
+
     <div id="top-bar">
         <button id="start-game-button">Start Game</button>
         <button id="recap-button">Recap Note</button>
@@ -199,7 +110,9 @@
             <span id="time-remaining">Time: 90</span>
         </div>
     </div>
+
     <p id="feedback"></p>
+
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let score = 0;
@@ -210,13 +123,38 @@
         let inputEnabled = true;
         const orientationOverlay = document.getElementById('orientation-overlay');
         const keyboardContainer = document.querySelector('.keyboard-container');
-        const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
         const keyElements = document.querySelectorAll('.white, .black');
+        const assetsPath = './assets/'; // Path to the sound assets
 
-        function isMobileOrTablet() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
+        // Frequency mapping to the corresponding sound files
+        const soundFiles = {
+            "261.63": "C4.mp3",
+            "277.18": "C4_sharp.mp3",
+            "293.66": "D4.mp3",
+            "311.13": "D4_sharp.mp3",
+            "329.63": "E4.mp3",
+            "349.23": "F4.mp3",
+            "369.99": "F4_sharp.mp3",
+            "392.00": "G4.mp3",
+            "415.30": "G4_sharp.mp3",
+            "440.00": "A4.mp3",
+            "466.16": "A4_sharp.mp3",
+            "493.88": "B4.mp3",
+            "523.25": "C5.mp3",
+            "554.37": "C5_sharp.mp3",
+            "587.33": "D5.mp3",
+            "622.25": "D5_sharp.mp3",
+            "659.26": "E5.mp3",
+            "698.46": "F5.mp3",
+            "739.99": "F5_sharp.mp3",
+            "783.99": "G5.mp3",
+            "830.61": "G5_sharp.mp3",
+            "880.00": "A5.mp3",
+            "932.33": "A5_sharp.mp3",
+            "987.77": "B5.mp3"
+        };
 
+        // Function to check device orientation
         function checkOrientation() {
             if (isMobileOrTablet()) {
                 if (window.innerWidth < window.innerHeight) {
@@ -228,146 +166,95 @@
                     keyboardContainer.style.display = 'flex';
                     document.getElementById('top-bar').style.display = 'flex';
                 }
-            } else {
-                orientationOverlay.style.display = 'none';
-                keyboardContainer.style.display = 'flex';
-                document.getElementById('top-bar').style.display = 'flex';
             }
         }
 
-        window.addEventListener('resize', checkOrientation);
-        window.addEventListener('orientationchange', checkOrientation);
-        document.addEventListener('DOMContentLoaded', checkOrientation);
-
-        function generateRandomFrequency() {
-            return allFrequencies[Math.floor(Math.random() * allFrequencies.length)];
+        // Function to detect mobile or tablet
+        function isMobileOrTablet() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         }
 
-        function playNote(frequency) {
-            const oscillator = audioCtx.createOscillator();
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-            const gainNode = audioCtx.createGain();
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.5);
+        // Play a sound from assets folder based on frequency
+        function playSound(frequency) {
+            const soundFile = soundFiles[frequency.toString()];
+            const audio = new Audio(assetsPath + soundFile);
+            audio.play();
         }
 
-        function playAwardSound() {
-            const oscillator = audioCtx.createOscillator();
-            oscillator.type = 'triangle';
-            oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
-            oscillator.frequency.setValueAtTime(700, audioCtx.currentTime + 0.2);
-            oscillator.connect(audioCtx.destination);
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.4);
+        // Play the feedback sound (correct or incorrect)
+        function playFeedbackSound(isCorrect) {
+            const feedbackSound = isCorrect ? 'correct.mp3' : 'incorrect.mp3';
+            const audio = new Audio(assetsPath + feedbackSound);
+            audio.play();
         }
 
-        function playDudSound() {
-            const oscillator = audioCtx.createOscillator();
-            oscillator.type = 'sawtooth';
-            oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
-            oscillator.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.5);
-            const gainNode = audioCtx.createGain();
-            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.5);
-        }
-
-        function playTargetNote() {
-            targetFrequency = generateRandomFrequency();
-            playNote(targetFrequency);
-        }
-
-        function handleUserInput(frequency) {
-            if (!inputEnabled) return;
-            const clickedKey = Array.from(keyElements).find(key => parseFloat(key.dataset.freq) === frequency);
-            if (Math.abs(targetFrequency - frequency) < 0.1) { // Allow for very small floating-point differences
-                score++;
-                playAwardSound();
-                updateScore();
-                highlightCorrectKey();
-                if (timeLeft > 0) {
-                    inputEnabled = false;
-                    setTimeout(() => {
-                        playTargetNote();
-                        inputEnabled = true;
-                    }, 600);
-                }
-            } else {
-                playDudSound();
-                updateScore();
-                if (clickedKey) {
-                    clickedKey.classList.add('wrong-highlight');
-                    setTimeout(() => {
-                        clickedKey.classList.remove('wrong-highlight');
-                    }, 500);
-                }
-            }
-        }
-
-        keyElements.forEach(key => {
-            key.addEventListener('click', () => {
-                handleUserInput(parseFloat(key.dataset.freq));
-            });
-        });
-
-        function updateScore() {
-            document.getElementById('score').textContent = `Score: ${score}`;
-            if (score > highScore) {
-                highScore = score;
-                document.getElementById('high-score').textContent = `High Score: ${highScore}`;
-            }
-        }
-
-        function updateTimer() {
-            if (timeLeft >= 0) {
-                document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
-            }
-        }
-
+        // Start the game logic
         function startGame() {
             score = 0;
             timeLeft = 90;
-            updateScore();
-            updateTimer();
-            playTargetNote();
+            document.getElementById('score').innerText = 'Score: ' + score;
+            document.getElementById('time-remaining').innerText = 'Time: ' + timeLeft;
+            document.getElementById('start-game-button').style.display = 'none';
             document.getElementById('play-again-button').style.display = 'none';
-            document.getElementById('feedback').textContent = "";
-            inputEnabled = true;
-            keyElements.forEach(key => key.style.pointerEvents = 'auto');
-            timer = setInterval(() => {
+            document.getElementById('play-all-notes-button').style.display = 'none';
+
+            timer = setInterval(function () {
                 timeLeft--;
-                updateTimer();
+                document.getElementById('time-remaining').innerText = 'Time: ' + timeLeft;
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    document.getElementById('feedback').textContent = "Time's up!";
-                    document.getElementById('play-again-button').style.display = 'block';
-                    inputEnabled = false;
-                    keyElements.forEach(key => key.style.pointerEvents = 'none');
+                    endGame();
                 }
             }, 1000);
-            // Hide the overlay when the game starts
-            document.getElementById('orientation-overlay').style.display = 'none';
-            keyboardContainer.style.display = 'flex';
-            document.getElementById('top-bar').style.display = 'flex';
+            nextNote();
         }
 
-        document.getElementById('start-game-button').addEventListener('click', startGame);
-        document.getElementById('recap-button').addEventListener('click', () => {
-            if (targetFrequency) {
-                playNote(targetFrequency);
+        // End game logic
+        function endGame() {
+            if (score > highScore) {
+                highScore = score;
+                document.getElementById('high-score').innerText = 'High Score: ' + highScore;
             }
+            document.getElementById('feedback').innerText = 'Game Over! Final Score: ' + score;
+            document.getElementById('play-again-button').style.display = 'inline-block';
+        }
+
+        // Generate the next note
+        function nextNote() {
+            const frequencies = Object.keys(soundFiles);
+            const randomIndex = Math.floor(Math.random() * frequencies.length);
+            targetFrequency = parseFloat(frequencies[randomIndex]);
+            playSound(targetFrequency);
+            document.getElementById('feedback').innerText = 'Listen to the note and click the corresponding key.';
+        }
+
+        // Check user's answer
+        function checkAnswer(frequency) {
+            if (Math.abs(frequency - targetFrequency) < 2) {
+                score += 10;
+                playFeedbackSound(true);  // Play correct feedback sound
+                nextNote();
+            } else {
+                score -= 5;
+                playFeedbackSound(false);  // Play incorrect feedback sound
+            }
+            document.getElementById('score').innerText = 'Score: ' + score;
+        }
+
+        // Event listeners for keys
+        keyElements.forEach(function (key) {
+            key.addEventListener('click', function () {
+                const frequency = parseFloat(key.getAttribute('data-freq'));
+                checkAnswer(frequency);
+            });
         });
+
+        document.getElementById('start-game-button').addEventListener('click', startGame);
         document.getElementById('play-again-button').addEventListener('click', startGame);
-        document.getElementById('play-all-notes-button').addEventListener('click', () => {
-            let delay = 0;
-            allFrequencies.forEach((freq) => {
-                setTimeout(() => {
-                    playNote(freq);
-                    highlightKey(freq);
-                }, delay);
+
+        // Initial orientation check
+        window.addEventListener('resize', checkOrientation);
+        checkOrientation();
+    </script>
+</body>
+</html>
