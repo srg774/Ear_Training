@@ -41,23 +41,22 @@
         // Function to play a single note
         function playNote(note) {
             const audio = new Audio(noteFiles[note]);
-            audio.play();
+            return new Promise((resolve) => {
+                audio.play();
+                audio.onended = resolve; // Resolve when audio finishes playing
+            });
         }
 
         // Function to play all notes in a smooth sweep
-        function playAllNotes() {
+        async function playAllNotes() {
             const allNotes = Object.keys(noteFiles);
-            let i = 0;
-
-            const playNext = () => {
-                if (i < allNotes.length) {
-                    playNote(allNotes[i]);
-                    i++;
-                    setTimeout(playNext, 500); // Play next note after 500ms
+            for (let i = 0; i < allNotes.length; i++) {
+                await playNote(allNotes[i]); // Wait for each note to finish before playing the next
+                // Optional: Add a small delay between notes (if needed)
+                if (i < allNotes.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 200)); // Adjust the delay between notes
                 }
-            };
-
-            playNext(); // Start the note sequence
+            }
         }
 
         // Button event listener to start playing all notes
