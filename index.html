@@ -222,7 +222,7 @@
             "F4-sharp": "Assets/F4-sharp.wav", "G4": "Assets/G4.wav", "G4-sharp": "Assets/G4-sharp.wav",
             "A4": "Assets/A4.wav", "A4-sharp": "Assets/A4-sharp.wav", "B4": "Assets/B4.wav",
             "C5": "Assets/C5.wav", "C5-sharp": "Assets/C5-sharp.wav", "D5": "Assets/D5.wav",
-            "D5-sharp": "Assets/D5-sharp.wav", "E5": "Assets/E5.wav", "F5": "Assets/F5.wav",
+            "D5-sharp": "Assets/D5-sharp.wav", "E5": "E5.wav", "F5": "F5.wav",
             "F5-sharp": "Assets/F5-sharp.wav", "G5": "Assets/G5.wav", "G5-sharp": "Assets/G5-sharp.wav",
             "A5": "Assets/A5.wav", "A5-sharp": "Assets/A5-sharp.wav", "B5": "Assets/B5.wav"
         };
@@ -354,4 +354,10 @@
                 document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
             }
         }
-        function startGame
+        function startGame() {
+            score = 0;
+            timeLeft = 90;
+            updateScore();
+            updateTimer();
+            playTargetNote();
+            document.getElementById('play-again-
