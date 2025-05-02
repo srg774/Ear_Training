@@ -1,12 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Play Chromatic Notes</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ear Trainer</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    #note-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background-color: #f2f2f2;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #ddd;
+    }
+  </style>
 </head>
 <body>
-  <h1>Play All Notes Chromatically</h1>
-  <button id="play-all-notes">Play All Notes</button>
+
+  <h1>Ear Training: Chromatic Notes</h1>
+  <button id="play-all-notes">▶ Play All Notes</button>
+
+  <div id="note-buttons"></div>
 
   <script>
     const noteFiles = {
@@ -36,35 +63,32 @@
       "B5": "Assets/B5.wav"
     };
 
-    const chromaticNotes = [
-      "C4", "C4-sharp", "D4", "D4-sharp", "E4",
-      "F4", "F4-sharp", "G4", "G4-sharp", "A4", "A4-sharp", "B4",
-      "C5", "C5-sharp", "D5", "D5-sharp", "E5",
-      "F5", "F5-sharp", "G5", "G5-sharp", "A5", "A5-sharp", "B5"
-    ];
+    const chromaticNotes = Object.keys(noteFiles);
 
     function playNote(note) {
-      return new Promise((resolve, reject) => {
-        const audio = new Audio(noteFiles[note]);
-        audio.volume = 0.7;
-        audio.play();
-        audio.onended = resolve;
-        audio.onerror = () => reject(`Error playing ${note}`);
-      });
+      const audio = new Audio(noteFiles[note]);
+      audio.volume = 0.9;
+      audio.play();
     }
 
     async function playAllNotes() {
-      for (let note of chromaticNotes) {
-        try {
-          await playNote(note);
-          await new Promise(r => setTimeout(r, 50)); // shorter delay
-        } catch (err) {
-          console.error(err);
-        }
+      for (const note of chromaticNotes) {
+        playNote(note);
+        await new Promise(r => setTimeout(r, 100)); // Fast transition between notes
       }
     }
 
+    // Play all notes button
     document.getElementById("play-all-notes").addEventListener("click", playAllNotes);
+
+    // Generate buttons for each individual note
+    const container = document.getElementById("note-buttons");
+    chromaticNotes.forEach(note => {
+      const btn = document.createElement("button");
+      btn.textContent = note;
+      btn.onclick = () => playNote(note);
+      container.appendChild(btn);
+    });
   </script>
 </body>
 </html>
