@@ -9,7 +9,7 @@
       padding: 20px;
     }
     button {
-      margin-right: 10px;
+      margin: 5px;
       padding: 10px 15px;
       font-size: 16px;
       cursor: pointer;
@@ -25,6 +25,8 @@
 
   <button id="play-forward">Play Forward</button>
   <button id="play-backward">Play Backward</button>
+  <button id="reward-sound">✅ Reward Sound</button>
+  <button id="mistake-sound">❌ Mistake Sound</button>
 
   <div id="tempo-container">
     <label for="tempo">Tempo (ms between notes): </label>
@@ -74,12 +76,46 @@
 
     function playSweep(notes) {
       const tempo = parseInt(document.getElementById("tempo").value);
-      const interval = tempo / 1000; // convert to seconds
-      const startTime = audioContext.currentTime + 0.05; // slight offset to avoid glitches
+      const interval = tempo / 1000; // in seconds
+      const startTime = audioContext.currentTime + 0.05;
 
       notes.forEach((note, i) => {
         playNoteAtTime(note, startTime + i * interval);
       });
+    }
+
+    function playRewardSound() {
+      const now = audioContext.currentTime;
+      const freqs = [523.25, 659.25, 783.99]; // C5, E5, G5
+
+      freqs.forEach((freq, i) => {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+
+        osc.connect(gain).connect(audioContext.destination);
+        osc.start(now + i * 0.03);
+        osc.stop(now + 1);
+      });
+    }
+
+    function playMistakeSound() {
+      const now = audioContext.currentTime;
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(261.63, now); // C4
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+      osc.connect(gain).connect(audioContext.destination);
+      osc.start(now);
+      osc.stop(now + 0.7);
     }
 
     document.getElementById("play-forward").addEventListener("click", () => {
@@ -89,6 +125,9 @@
     document.getElementById("play-backward").addEventListener("click", () => {
       playSweep([...chromaticNotes].reverse());
     });
+
+    document.getElementById("reward-sound").addEventListener("click", playRewardSound);
+    document.getElementById("mistake-sound").addEventListener("click", playMistakeSound);
 
     document.getElementById("tempo").addEventListener("input", (e) => {
       document.getElementById("tempo-value").textContent = e.target.value;
