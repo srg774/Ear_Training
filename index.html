@@ -125,6 +125,46 @@
         .wrong-highlight {
             background-color: lightcoral;
         }
+        #info-bar {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    gap: 10px;
+}
+
+#info-icon {
+    cursor: pointer;
+    font-size: 20px;
+    padding: 4px 8px;
+    background-color: #ddd;
+    border-radius: 50%;
+    text-align: center;
+}
+
+#branding {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+#info-box {
+    display: none;
+    position: absolute;
+    top: 30px;
+    left: 0;
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #aaa;
+    padding: 10px;
+    width: 300px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+}
+
         <div id="info-bar">
     <span id="info-icon" title="Click for instructions">ℹ️</span>
     <span id="branding">SRG774 - EarTraining 2025 ©</span>
@@ -480,6 +520,10 @@ button {
                 }
             });
         }
+        document.getElementById('info-icon').addEventListener('click', () => {
+    const infoBox = document.getElementById('info-box');
+    infoBox.style.display = infoBox.style.display === 'block' ? 'none' : 'block';
+});
     </script>
 </body>
 </html>
