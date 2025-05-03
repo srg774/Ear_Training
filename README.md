@@ -22,7 +22,6 @@ This is a simple web-based ear training game that helps users practice identifyi
 
 ## How to Use
 
-1. **Open the `index.html` file** in a web browser.
 2. **Click "Start Game"** to begin the game.
 3. **Listen to the target note** played by the game.
 4. **Click the corresponding key** on the virtual keyboard.
