@@ -537,10 +537,18 @@ button {
                 }
             });
         }
-        document.getElementById('info-icon').addEventListener('click', () => {
+document.getElementById('info-icon').addEventListener('click', () => {
     const infoBox = document.getElementById('info-box');
     infoBox.style.display = infoBox.style.display === 'block' ? 'none' : 'block';
+    
+    // Automatically close the info box after 5 seconds
+    if (infoBox.style.display === 'block') {
+        setTimeout(() => {
+            infoBox.style.display = 'none';
+        }, 5000);  // 5000 milliseconds = 5 seconds
+    }
 });
+
     </script>
 </body>
 </html>
