@@ -10,7 +10,7 @@ This is a simple web-based ear training game that helps users practice identifyi
 * **Note Playback:** Plays audio tones corresponding to musical note frequencies.
 * **Random Note Generation:** Generates random target notes for the user to identify.
 * **Scoring System:** Tracks the user's score and high score.
-* **Timer:** A 60-second countdown to add a time-based challenge.
+* **Timer:** A 90-second countdown to add a time-based challenge.
 * **Feedback:** Provides visual and auditory feedback on correct and incorrect guesses.
 * **Recap and Play All Notes:** Buttons to replay the target note or play all notes in sequence.
 * **Sharp/Flat Labels:** Black keys display both sharp and flat note labels (e.g., C#/D♭).
