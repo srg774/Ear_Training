@@ -8,6 +8,7 @@ This is a simple web-based ear training game that helps users practice identifyi
 
 * **Grand Piano Samples:** Uses high-quality samples for an authentic sound.
 * **Mobile-Friendly Design:** Responsive layout with orientation prompts for optimal use on phones.
+* **Offline Support:** Fully functional in offline mode after first load — great for use in airplane mode.
 * **Intuitive Sound Feedback:** Immediate audio and visual cues for correct and incorrect selections.
 * **Interactive Keyboard:** A visual representation of a piano keyboard with both white and black keys.
 * **Random Note Generation:** Generates random target notes for the user to identify.
