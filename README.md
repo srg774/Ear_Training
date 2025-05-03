@@ -6,8 +6,10 @@ This is a simple web-based ear training game that helps users practice identifyi
 
 ## Features
 
+* **Grand Piano Samples:** Uses high-quality samples for an authentic sound.
+* **Mobile-Friendly Design:** Responsive layout with orientation prompts for optimal use on phones.
+* **Intuitive Sound Feedback:** Immediate audio and visual cues for correct and incorrect selections.
 * **Interactive Keyboard:** A visual representation of a piano keyboard with both white and black keys.
-* **Note Playback:** Plays audio tones corresponding to musical note frequencies.
 * **Random Note Generation:** Generates random target notes for the user to identify.
 * **Scoring System:** Tracks the user's score and high score.
 * **Timer:** A 90-second countdown to add a time-based challenge.
@@ -29,6 +31,7 @@ This is a simple web-based ear training game that helps users practice identifyi
 8. **Click "Play Again"** to restart the game.
 9. **Click "Recap Note"** to replay the target note.
 10. **Click "Play All Notes"** to hear all notes in sequence.
+11. **Info Toggle:** Press 'i' at the top left of the screen to display or hide gameplay instructions.
 
 ## Technologies Used
 
@@ -53,6 +56,3 @@ Contributions are welcome! If you have any suggestions or improvements, please f
 
 This project is licensed under the Creative Commons Attribution-NonCommercial (CC BY-NC) license. (See License Section)
 
----
-
-This update clarifies some of the features and makes the flow of instructions slightly smoother. Let me know if you'd like any further tweaks!
