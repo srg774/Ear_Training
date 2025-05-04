@@ -403,23 +403,16 @@ button {
             return allFrequencies[Math.floor(Math.random() * allFrequencies.length)];
         }
 
-        function playNote(frequency) {
-            const freqString = frequency.toFixed(2);
-            if (noteBuffers[freqString]) {
-                playBuffer(noteBuffers[freqString]);
-            } else {
-                // Fallback to the oscillator if the buffer isn't loaded (shouldn't happen)
-                const oscillator = audioCtx.createOscillator();
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-                const gainNode = audioCtx.createGain();
-                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + 0.5);
-            }
-        }
+function playNote(frequency) {
+    const freqString = frequency.toFixed(2);
+    if (noteBuffers[freqString]) {
+        playBuffer(noteBuffers[freqString]);
+    } else {
+        console.error('Audio buffer not loaded for frequency:', frequency);
+        // We are no longer falling back to the oscillator.
+        // If a buffer isn't loaded, we'll log an error instead.
+    }
+}
 
         function playTargetNote() {
             targetFrequency = generateRandomFrequency();
