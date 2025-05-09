@@ -468,28 +468,36 @@ function playNote(frequency) {
             }
         }
 
-        function startGame() {
-            score = 0;
-            timeLeft = 90;
-            updateScore();
-            updateTimer();
-            playTargetNote();
-            document.getElementById('play-again-button').style.display = 'none';
+function startGame() {
+    score = 0;
+    timeLeft = 90;
+    updateScore();
+    updateTimer();
+    playTargetNote();
+    document.getElementById('play-again-button').style.display = 'none';
+    document.getElementById('feedback').textContent = "";
+    inputEnabled = true;
+    keyElements.forEach(key => key.style.pointerEvents = 'auto');
+    
+    // Disable the Start Game button during the game
+    document.getElementById('start-game-button').disabled = true;
+
+    timer = setInterval(() => {
+        timeLeft--;
+        updateTimer();
+        if (timeLeft <= 0) {
+            clearInterval(timer);
             document.getElementById('feedback').textContent = "";
-            inputEnabled = true;
-            keyElements.forEach(key => key.style.pointerEvents = 'auto');
-            timer = setInterval(() => {
-                timeLeft--;
-                updateTimer();
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    document.getElementById('feedback').textContent = "";
-                    document.getElementById('play-again-button').style.display = 'block';
-                    inputEnabled = false;
-                    keyElements.forEach(key => key.style.pointerEvents = 'none');
-                }
-            }, 1000);
+            document.getElementById('play-again-button').style.display = 'block';
+            inputEnabled = false;
+            keyElements.forEach(key => key.style.pointerEvents = 'none');
+            
+            // Re-enable the Start Game button after the game ends
+            document.getElementById('start-game-button').disabled = false;
         }
+    }, 1000);
+}
+
 
         document.getElementById('start-game-button').addEventListener('click', startGame);
         document.getElementById('recap-button').addEventListener('click', () => {
@@ -498,16 +506,25 @@ function playNote(frequency) {
             }
         });
         document.getElementById('play-again-button').addEventListener('click', startGame);
-        document.getElementById('play-all-notes-button').addEventListener('click', () => {
-            let delay = 0;
-            allFrequencies.forEach((freq) => {
-                setTimeout(() => {
-                    playNote(freq);
-                    highlightKey(freq);
-                }, delay);
-                delay += 600;
-            });
-        });
+document.getElementById('play-all-notes-button').addEventListener('click', () => {
+    let delay = 0;
+    const playAllButton = document.getElementById('play-all-notes-button');
+    playAllButton.disabled = true; // Disable the button
+    
+    allFrequencies.forEach((freq) => {
+        setTimeout(() => {
+            playNote(freq);
+            highlightKey(freq);
+        }, delay);
+        delay += 600;
+    });
+    
+    // Re-enable the button after all notes have been played
+    setTimeout(() => {
+        playAllButton.disabled = false;
+    }, delay); // After all notes have been played
+});
+
 
         function highlightKey(frequency) {
             keyElements.forEach(key => {
