@@ -468,7 +468,12 @@ function playNote(frequency) {
             }
         }
 
-function startGame() {
+async function startGame() {
+    // Resume audio context if it's suspended
+    if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+    }
+
     score = 0;
     timeLeft = 90;
     updateScore();
@@ -497,6 +502,7 @@ function startGame() {
         }
     }, 1000);
 }
+
 
 
         document.getElementById('start-game-button').addEventListener('click', startGame);
