@@ -7,18 +7,10 @@
 
     <title>Ear Training Game</title>
 
-    <!-- Manifest link -->
     <link rel="manifest" href="manifest.json">
-
-    <!-- Favicon for all platforms -->
     <link rel="icon" href="Assets/android-chrome-512x512.png" sizes="512x512" type="image/png">
-
-    <!-- Favicon for Android devices -->
     <link rel="icon" href="Assets/android-chrome-192x192.png" sizes="192x192" type="image/png">
-
-    <!-- Favicon for Apple devices -->
     <link rel="apple-touch-icon" href="Assets/android-chrome-192x192.png">
-
 
     <style>
         body {
@@ -57,9 +49,6 @@
             height: 240px;
             background-color: white;
             border: 1px solid black;
-            display: inline-block;
-            position: relative;
-            z-index: 1;
             display: flex;
             justify-content: center;
             align-items: flex-end;
@@ -67,16 +56,15 @@
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            z-index: 1;
         }
 
         .black {
             width: 36px;
             height: 160px;
             background-color: black;
-            display: inline-block;
             position: absolute;
             z-index: 2;
-            left: 30px;
             transform: translateX(-18px);
             cursor: pointer;
             display: flex;
@@ -114,10 +102,6 @@
             text-align: center;
         }
 
-        #top-bar button {
-            flex-shrink: 0;
-        }
-
         #info-group {
             display: flex;
             gap: 10px;
@@ -133,55 +117,42 @@
             text-align: center;
         }
 
-        .highlighted {
-            background-color: lightblue;
-        }
+        .highlighted { background-color: lightblue !important; }
+        .wrong-highlight { background-color: lightcoral !important; }
 
-        .wrong-highlight {
-            background-color: lightcoral;
-        }
         #info-bar {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 2000;
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-    gap: 10px;
-    box-shadow: none !important; /* Ensure no shadow on the info bar */
-}
-}
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            gap: 10px;
+        }
 
-#info-icon {
-    cursor: pointer;
-    font-size: 20px;
-    padding: 4px 8px;
-    background-color: #ddd;
-    border-radius: 50%;
-    text-align: center;
-    box-shadow: none !important; /* Forcefully remove drop shadow */
-}
+        #info-icon {
+            cursor: pointer;
+            font-size: 20px;
+            padding: 4px 8px;
+            background-color: #ddd;
+            border-radius: 50%;
+        }
 
-#branding {
-    font-weight: bold;
-    font-size: 16px;
-}
-
-#info-box {
-    display: none;
-    position: absolute;
-    top: 30px;
-    left: 0;
-    background-color: #fff;
-    color: #333;
-    border: 1px solid #aaa;
-    padding: 10px;
-    width: 300px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    font-size: 14px;
-}
+        #info-box {
+            display: none;
+            position: absolute;
+            top: 30px;
+            left: 0;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #aaa;
+            padding: 10px;
+            width: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+        }
 
         #orientation-overlay {
             position: fixed;
@@ -191,374 +162,291 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.9);
             color: white;
-            display: flex;
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            font-size: 20px;
+            font-size: 28px;
             text-align: center;
         }
 
-        #orientation-overlay p {
-            margin: 20px;
+        button {
+            border-radius: 12px;
+            padding: 10px 18px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
-        /* Bigger overlay text */
-#orientation-overlay {
-    font-size: 28px;
-}
 
-#orientation-overlay p {
-    font-size: 32px;
-}
-
-/* Rounder and larger buttons */
-#game-controls button,
-button {
-    border-radius: 12px;     /* Adjust roundness here */
-    padding: 10px 18px;      /* Adjust button size here */
-    font-size: 16px;         /* Optional: slightly larger text */
-    cursor: pointer;         /* Optional: shows pointer on hover */
-    transition: background-color 0.3s ease;
-}
-        #score,
-#high-score,
-#time-remaining {
-    font-size: 22px; /* or any size you like */
-    font-weight: bold;
-}
-
+        #score, #high-score, #time-remaining {
+            font-size: 22px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-            <div id="info-bar">
-    <span id="info-icon" title="Click for instructions">ℹ️</span>
-    <span id="branding">SRG774 - EarTraining 2025 ©</span>
+<div id="info-bar">
+    <span id="info-icon">ℹ️</span>
+    <span id="branding">SRG774 - EarTraining 2026 ©</span>
     <div id="info-box">
-        Welcome to the Ear Training Game! Click "Start Game" to begin. A musical note will play—your goal is to click the key that matches the note you heard. You can click "Recap Note" to hear the note again if you're unsure. Try to get as many correct answers as possible before time runs out. Use "Play All Notes" to listen to all the keys and get familiar with their sounds. <strong>For the best experience, add this app to your home screen or install it.</strong>
+        Welcome! Click "Start Game" to begin. A musical note will play—click the key that matches. Use "Recap Note" to hear it again.
     </div>
 </div>
 
-    <div id="orientation-overlay" style="display: none;">
-        <p>Please rotate your device to landscape mode for the best experience.</p>
-        <svg viewBox="0 0 64 32" width="64" height="32" fill="white">
-            <rect x="5" y="8" width="54" height="16" rx="2" ry="2" />
-            <rect x="2" y="6" width="6" height="20" rx="1" ry="1" />
-            <rect x="56" y="6" width="6" height="20" rx="1" ry="1" />
-        </svg>
-    </div>
+<div id="orientation-overlay">
+    <p>Please rotate your device to landscape mode.</p>
+</div>
 
-    <div class="keyboard-container">
-        <div class="keyboard">
-            <div class="octave">
-                <div class="octave-label c4-label">C4</div>
-                <div class="white" data-freq="261.63">C</div>
-                <div class="black c-sharp" data-freq="277.18">C#<br>D♭</div>
-                <div class="white" data-freq="293.66">D</div>
-                <div class="black d-sharp" data-freq="311.13">D#<br>E♭</div>
-                <div class="white" data-freq="329.63">E</div>
-                <div class="white" data-freq="349.23">F</div>
-                <div class="black f-sharp" data-freq="369.99">F#<br>G♭</div>
-                <div class="white" data-freq="392.00">G</div>
-                <div class="black g-sharp" data-freq="415.30">G#<br>A♭</div>
-                <div class="white" data-freq="440.00">A</div>
-                <div class="black a-sharp" data-freq="466.16">A#<br>B♭</div>
-                <div class="white" data-freq="493.88">B</div>
-            </div>
-            <div class="octave">
-                <div class="octave-label c5-label">C5</div>
-                <div class="white" data-freq="523.25">C</div>
-                <div class="black c-sharp" data-freq="554.37">C#<br>D♭</div>
-                <div class="white" data-freq="587.33">D</div>
-                <div class="black d-sharp" data-freq="622.25">D#<br>E♭</div>
-                <div class="white" data-freq="659.26">E</div>
-                <div class="white" data-freq="698.46">F</div>
-                <div class="black f-sharp" data-freq="739.99">F#<br>G♭</div>
-                <div class="white" data-freq="783.99">G</div>
-                <div class="black g-sharp" data-freq="830.61">G#<br>A♭</div>
-                <div class="white" data-freq="880.00">A</div>
-                <div class="black a-sharp" data-freq="932.33">A#<br>B♭</div>
-                <div class="white" data-freq="987.77">B</div>
-            </div>
+<div class="keyboard-container">
+    <div class="keyboard">
+        <div class="octave">
+            <div class="octave-label c4-label">C4</div>
+            <div class="white" data-freq="261.63">C</div>
+            <div class="black c-sharp" data-freq="277.18">C#<br>D♭</div>
+            <div class="white" data-freq="293.66">D</div>
+            <div class="black d-sharp" data-freq="311.13">D#<br>E♭</div>
+            <div class="white" data-freq="329.63">E</div>
+            <div class="white" data-freq="349.23">F</div>
+            <div class="black f-sharp" data-freq="369.99">F#<br>G♭</div>
+            <div class="white" data-freq="392.00">G</div>
+            <div class="black g-sharp" data-freq="415.30">G#<br>A♭</div>
+            <div class="white" data-freq="440.00">A</div>
+            <div class="black a-sharp" data-freq="466.16">A#<br>B♭</div>
+            <div class="white" data-freq="493.88">B</div>
+        </div>
+        <div class="octave">
+            <div class="octave-label c5-label">C5</div>
+            <div class="white" data-freq="523.25">C</div>
+            <div class="black c-sharp" data-freq="554.37">C#<br>D♭</div>
+            <div class="white" data-freq="587.33">D</div>
+            <div class="black d-sharp" data-freq="622.25">D#<br>E♭</div>
+            <div class="white" data-freq="659.26">E</div>
+            <div class="white" data-freq="698.46">F</div>
+            <div class="black f-sharp" data-freq="739.99">F#<br>G♭</div>
+            <div class="white" data-freq="783.99">G</div>
+            <div class="black g-sharp" data-freq="830.61">G#<br>A♭</div>
+            <div class="white" data-freq="880.00">A</div>
+            <div class="black a-sharp" data-freq="932.33">A#<br>B♭</div>
+            <div class="white" data-freq="987.77">B</div>
         </div>
     </div>
+</div>
 
-    <div id="top-bar">
-        <button id="start-game-button">Start Game</button>
-        <button id="recap-button">Recap Note</button>
-        <button id="play-again-button" style="display: none;">Play Again</button>
-        <button id="play-all-notes-button">Play All Notes</button>
-        <div id="info-group">
-            <span id="score">Score: 0</span>
-            <span id="high-score">High Score: 0</span>
-            <span id="time-remaining">Time: 90</span>
-        </div>
+<div id="top-bar">
+    <button id="start-game-button" disabled>Loading Sounds...</button>
+    <button id="recap-button">Recap Note</button>
+    <button id="play-again-button" style="display: none;">Play Again</button>
+    <button id="play-all-notes-button">Play All Notes</button>
+    <div id="info-group">
+        <span id="score">Score: 0</span>
+        <span id="high-score">High Score: 0</span>
+        <span id="time-remaining">Time: 90</span>
     </div>
+</div>
 
-    <p id="feedback"></p>
+<p id="feedback"></p>
 
-    <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let score = 0;
-        let highScore = 0;
-        let timeLeft = 90;
-        let timer;
-        let targetFrequency;
-        let inputEnabled = true;
-        const orientationOverlay = document.getElementById('orientation-overlay');
-        const keyboardContainer = document.querySelector('.keyboard-container');
-        const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
-        const keyElements = document.querySelectorAll('.white, .black');
+<script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let score = 0;
+    let highScore = 0;
+    let timeLeft = 90;
+    let timer;
+    let targetFrequency;
+    let inputEnabled = false; // Start disabled until buffers load
 
-        // --- New Audio Variables and Functions ---
-        const noteBuffers = {};
-        const noteFiles = {
-          "261.63": "Assets/C4.wav", "277.18": "Assets/C4-sharp.wav", "293.66": "Assets/D4.wav",
-          "311.13": "Assets/D4-sharp.wav", "329.63": "Assets/E4.wav", "349.23": "Assets/F4.wav",
-          "369.99": "Assets/F4-sharp.wav", "392.00": "Assets/G4.wav", "415.30": "Assets/G4-sharp.wav",
-          "440.00": "Assets/A4.wav", "466.16": "Assets/A4-sharp.wav", "493.88": "Assets/B4.wav",
-          "523.25": "Assets/C5.wav", "554.37": "Assets/C5-sharp.wav", "587.33": "Assets/D5.wav",
-          "622.25": "Assets/D5-sharp.wav", "659.26": "Assets/E5.wav", "698.46": "Assets/F5.wav",
-          "739.99": "Assets/F5-sharp.wav", "783.99": "Assets/G5.wav", "830.61": "Assets/G5-sharp.wav",
-          "880.00": "Assets/A5.wav", "932.33": "Assets/A5-sharp.wav", "987.77": "Assets/B5.wav"
-        };
+    const allFrequencies = [261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392.00, 415.30, 440.00, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880.00, 932.33, 987.77];
+    const keyElements = document.querySelectorAll('.white, .black');
+    const noteBuffers = {};
+    const noteFiles = {
+        "261.63": "Assets/C4.wav", "277.18": "Assets/C4-sharp.wav", "293.66": "Assets/D4.wav",
+        "311.13": "Assets/D4-sharp.wav", "329.63": "Assets/E4.wav", "349.23": "Assets/F4.wav",
+        "369.99": "Assets/F4-sharp.wav", "392.00": "Assets/G4.wav", "415.30": "Assets/G4-sharp.wav",
+        "440.00": "Assets/A4.wav", "466.16": "Assets/A4-sharp.wav", "493.88": "Assets/B4.wav",
+        "523.25": "Assets/C5.wav", "554.37": "Assets/C5-sharp.wav", "587.33": "Assets/D5.wav",
+        "622.25": "Assets/D5-sharp.wav", "659.26": "Assets/E5.wav", "698.46": "Assets/F5.wav",
+        "739.99": "Assets/F5-sharp.wav", "783.99": "Assets/G5.wav", "830.61": "Assets/G5-sharp.wav",
+        "880.00": "Assets/A5.wav", "932.33": "Assets/A5-sharp.wav", "987.77": "Assets/B5.wav"
+    };
 
-        async function loadBuffers() {
-          for (const freq in noteFiles) {
-            const response = await fetch(noteFiles[freq]);
-            const arrayBuffer = await response.arrayBuffer();
-            noteBuffers[freq] = await audioCtx.decodeAudioData(arrayBuffer);
-          }
-        }
-
-        function playBuffer(buffer) {
-          if (buffer) {
-            const source = audioCtx.createBufferSource();
-            source.buffer = buffer;
-            source.connect(audioCtx.destination);
-            source.start();
-          }
-        }
-
-        function playCorrectSound() {
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(440, now);
-            gain.gain.setValueAtTime(0.95, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start(now);
-            osc.stop(now + 0.4);
-        }
-
-        function playMistakeSound() {
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(220, now);
-            gain.gain.setValueAtTime(0.8, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start(now);
-            osc.stop(now + 0.5);
-        }
-        // --- End of New Audio Variables and Functions ---
-
-        function isMobileOrTablet() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-
-        function checkOrientation() {
-            if (isMobileOrTablet()) {
-                if (window.innerWidth < window.innerHeight) {
-                    orientationOverlay.style.display = 'flex';
-                    keyboardContainer.style.display = 'none';
-                    document.getElementById('top-bar').style.display = 'none';
-                } else {
-                    orientationOverlay.style.display = 'none';
-                    keyboardContainer.style.display = 'flex';
-                    document.getElementById('top-bar').style.display = 'flex';
-                }
-            } else {
-                orientationOverlay.style.display = 'none';
-                keyboardContainer.style.display = 'flex';
-                document.getElementById('top-bar').style.display = 'flex';
-            }
-        }
-
-        window.addEventListener('resize', checkOrientation);
-        window.addEventListener('orientationchange', checkOrientation);
-        document.addEventListener('DOMContentLoaded', () => {
-            checkOrientation();
-            loadBuffers(); // Load the audio buffers when the page loads
-        });
-
-        function generateRandomFrequency() {
-            return allFrequencies[Math.floor(Math.random() * allFrequencies.length)];
-        }
-
-function playNote(frequency) {
-    const freqString = frequency.toFixed(2);
-    if (noteBuffers[freqString]) {
-        playBuffer(noteBuffers[freqString]);
-    } else {
-        console.error('Audio buffer not loaded for frequency:', frequency);
-        // We are no longer falling back to the oscillator.
-        // If a buffer isn't loaded, we'll log an error instead.
-    }
-}
-
-        function playTargetNote() {
-            targetFrequency = generateRandomFrequency();
-            playNote(targetFrequency);
-        }
-
-        function handleUserInput(frequency) {
-            if (!inputEnabled) return;
-
-            const clickedKey = Array.from(keyElements).find(key => parseFloat(key.dataset.freq) === frequency);
-
-            if (targetFrequency === frequency) {
-                score++;
-                playCorrectSound(); // Use the new correct sound
-                updateScore();
-                highlightCorrectKey();
-                if (timeLeft > 0) {
-                    inputEnabled = false;
-                    setTimeout(() => {
-                        playTargetNote();
-                        inputEnabled = true;
-                    }, 600);
-                }
-            } else {
-                playMistakeSound(); // Use the new mistake sound
-                updateScore();
-                if (clickedKey) {
-                    clickedKey.classList.add('wrong-highlight');
-                    setTimeout(() => {
-                        clickedKey.classList.remove('wrong-highlight');
-                    }, 500);
-                }
-            }
-        }
-
-        keyElements.forEach(key => {
-            key.addEventListener('click', () => {
-                handleUserInput(parseFloat(key.dataset.freq));
+    // Load buffers with error checking
+    async function loadBuffers() {
+        const startBtn = document.getElementById('start-game-button');
+        try {
+            const promises = Object.keys(noteFiles).map(async (freq) => {
+                const response = await fetch(noteFiles[freq]);
+                if (!response.ok) throw new Error(`Missing: ${noteFiles[freq]}`);
+                const arrayBuffer = await response.arrayBuffer();
+                noteBuffers[freq] = await audioCtx.decodeAudioData(arrayBuffer);
             });
-        });
 
-        function updateScore() {
-            document.getElementById('score').textContent = `Score: ${score}`;
-            if (score > highScore) {
-                highScore = score;
-                document.getElementById('high-score').textContent = `High Score: ${highScore}`;
-            }
-        }
-
-        function updateTimer() {
-            if (timeLeft >= 0) {
-                document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
-            }
-        }
-
-function startGame() {
-    score = 0;
-    timeLeft = 90;
-    updateScore();
-    updateTimer();
-    playTargetNote();
-    document.getElementById('play-again-button').style.display = 'none';
-    document.getElementById('feedback').textContent = "";
-    inputEnabled = true;
-    keyElements.forEach(key => key.style.pointerEvents = 'auto');
-    
-    // Disable the Start Game button during the game
-    document.getElementById('start-game-button').disabled = true;
-
-    timer = setInterval(() => {
-        timeLeft--;
-        updateTimer();
-        if (timeLeft <= 0) {
-            clearInterval(timer);
-            document.getElementById('feedback').textContent = "";
-            document.getElementById('play-again-button').style.display = 'block';
-            inputEnabled = false;
-            keyElements.forEach(key => key.style.pointerEvents = 'none');
+            await Promise.all(promises);
             
-            // Re-enable the Start Game button after the game ends
-            document.getElementById('start-game-button').disabled = false;
+            startBtn.disabled = false;
+            startBtn.textContent = "Start Game";
+            inputEnabled = true;
+            console.log("All audio buffers loaded successfully.");
+        } catch (err) {
+            console.error("Audio Load Error:", err);
+            startBtn.textContent = "Error Loading Audio";
         }
-    }, 1000);
-}
+    }
 
+    function playBuffer(buffer) {
+        if (!buffer) return;
+        const source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(audioCtx.destination);
+        source.start();
+    }
 
-        document.getElementById('start-game-button').addEventListener('click', startGame);
-        document.getElementById('recap-button').addEventListener('click', () => {
-            if (targetFrequency) {
-                playNote(targetFrequency);
+    function playNote(frequency) {
+        const freqString = parseFloat(frequency).toFixed(2);
+        if (noteBuffers[freqString]) {
+            playBuffer(noteBuffers[freqString]);
+        } else {
+            console.error('Audio buffer not loaded for frequency:', freqString);
+        }
+    }
+
+    // Feedback sounds using Oscillators
+    function playFeedbackSound(type) {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = (type === 'correct') ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime((type === 'correct') ? 440 : 220, now);
+        gain.gain.setValueAtTime(0.5, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.5);
+    }
+
+    async function startGame() {
+        // Essential: Resume context on user click
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+
+        score = 0;
+        timeLeft = 90;
+        updateScore();
+        updateTimer();
+        playTargetNote();
+        
+        document.getElementById('play-again-button').style.display = 'none';
+        document.getElementById('feedback').textContent = "";
+        document.getElementById('start-game-button').disabled = true;
+        
+        inputEnabled = true;
+        clearInterval(timer);
+        timer = setInterval(() => {
+            timeLeft--;
+            updateTimer();
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                inputEnabled = false;
+                document.getElementById('play-again-button').style.display = 'block';
+                document.getElementById('start-game-button').disabled = false;
+            }
+        }, 1000);
+    }
+
+    function playTargetNote() {
+        targetFrequency = allFrequencies[Math.floor(Math.random() * allFrequencies.length)];
+        playNote(targetFrequency);
+    }
+
+    function handleUserInput(frequency) {
+        if (!inputEnabled) return;
+
+        if (Math.abs(targetFrequency - frequency) < 0.1) {
+            score++;
+            playFeedbackSound('correct');
+            updateScore();
+            highlightKey(frequency, 'highlighted');
+            inputEnabled = false;
+            setTimeout(() => {
+                if (timeLeft > 0) {
+                    playTargetNote();
+                    inputEnabled = true;
+                }
+            }, 800);
+        } else {
+            playFeedbackSound('wrong');
+            highlightKey(frequency, 'wrong-highlight');
+        }
+    }
+
+    function highlightKey(frequency, className) {
+        keyElements.forEach(key => {
+            if (parseFloat(key.dataset.freq) === frequency) {
+                key.classList.add(className);
+                setTimeout(() => key.classList.remove(className), 500);
             }
         });
-        document.getElementById('play-again-button').addEventListener('click', startGame);
-document.getElementById('play-all-notes-button').addEventListener('click', () => {
-    let delay = 0;
-    const playAllButton = document.getElementById('play-all-notes-button');
-    playAllButton.disabled = true; // Disable the button
-    
-    allFrequencies.forEach((freq) => {
-        setTimeout(() => {
-            playNote(freq);
-            highlightKey(freq);
-        }, delay);
-        delay += 600;
-    });
-    
-    // Re-enable the button after all notes have been played
-    setTimeout(() => {
-        playAllButton.disabled = false;
-    }, delay); // After all notes have been played
-});
-
-
-        function highlightKey(frequency) {
-            keyElements.forEach(key => {
-                if (parseFloat(key.dataset.freq) === frequency) {
-                    key.classList.add('highlighted');
-                    setTimeout(() => {
-                        key.classList.remove('highlighted');
-                    }, 500);
-                }
-            });
-        }
-
-        function highlightCorrectKey() {
-            keyElements.forEach(key => {
-                if (parseFloat(key.dataset.freq) === targetFrequency) {
-                    key.classList.add('highlighted');
-                    setTimeout(() => {
-                        key.classList.remove('highlighted');
-                    }, 500);
-                }
-            });
-        }
-document.getElementById('info-icon').addEventListener('click', () => {
-    const infoBox = document.getElementById('info-box');
-    infoBox.style.display = infoBox.style.display === 'block' ? 'none' : 'block';
-    
-    // Automatically close the info box after 5 seconds
-    if (infoBox.style.display === 'block') {
-        setTimeout(() => {
-            infoBox.style.display = 'none';
-        }, 15000);  // 15000 milliseconds = 10 seconds
     }
-});
 
-    </script>
+    // Event Listeners
+    keyElements.forEach(key => {
+        key.addEventListener('click', () => handleUserInput(parseFloat(key.dataset.freq)));
+    });
+
+    document.getElementById('start-game-button').addEventListener('click', startGame);
+    document.getElementById('play-again-button').addEventListener('click', startGame);
+    document.getElementById('recap-button').addEventListener('click', () => {
+        if (targetFrequency) playNote(targetFrequency);
+    });
+
+    document.getElementById('play-all-notes-button').addEventListener('click', async () => {
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+        let delay = 0;
+        const btn = document.getElementById('play-all-notes-button');
+        btn.disabled = true;
+        allFrequencies.forEach((freq) => {
+            setTimeout(() => {
+                playNote(freq);
+                highlightKey(freq, 'highlighted');
+            }, delay);
+            delay += 500;
+        });
+        setTimeout(() => btn.disabled = false, delay);
+    });
+
+    function updateScore() {
+        document.getElementById('score').textContent = `Score: ${score}`;
+        if (score > highScore) {
+            highScore = score;
+            document.getElementById('high-score').textContent = `High Score: ${highScore}`;
+        }
+    }
+
+    function updateTimer() {
+        document.getElementById('time-remaining').textContent = `Time: ${timeLeft}`;
+    }
+
+    // Info Box toggle
+    document.getElementById('info-icon').addEventListener('click', () => {
+        const box = document.getElementById('info-box');
+        box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+    });
+
+    // Orientation Logic
+    function checkOrientation() {
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const overlay = document.getElementById('orientation-overlay');
+        overlay.style.display = (window.innerWidth < 600 && !isLandscape) ? 'flex' : 'none';
+    }
+
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('DOMContentLoaded', () => {
+        checkOrientation();
+        loadBuffers();
+    });
+</script>
 </body>
 </html>
